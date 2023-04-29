@@ -10,9 +10,6 @@ require('dotenv').config();
 // import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
-const categoryRoutes = require('./routes/category');
-const productRoutes = require('./routes/product');
-const orderRoutes = require('./routes/order');
 
 // app
 const app = express();
@@ -49,9 +46,6 @@ app.use(cors());
 
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
-app.use('/api', categoryRoutes);
-app.use('/api', productRoutes);
-app.use('/api', orderRoutes);
 
 if (process.env.NODE_ENV == "development") {
     const swaggerUI = require("swagger-ui-express")

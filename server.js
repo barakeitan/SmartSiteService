@@ -10,6 +10,7 @@ require('dotenv').config();
 // import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const telemetryReoutes = require("./routes/telemetry");
 
 // app
 const app = express();
@@ -46,6 +47,7 @@ app.use(cors());
 
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
+app.use('/api',telemetryReoutes);
 
 if (process.env.NODE_ENV == "development") {
     const swaggerUI = require("swagger-ui-express")

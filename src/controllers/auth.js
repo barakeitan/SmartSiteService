@@ -6,7 +6,6 @@ const { errorHandler } = require('../helpers/dbErrorHandler');
 require('dotenv').config();
 
 exports.signup = (req, res) => {
-  // console.log('req.body', req.body);
   const user = new User(req.body);
   user.save((err, user) => {
     if (err) {
@@ -39,9 +38,18 @@ exports.signin = (req, res) => {
       });
     }
     // generate a signed token with user id and secret
+    // const tokenExpiration =
+    //         Number((new Date().getTime() / 1000).toFixed()) +
+    //         parseInt(process.env.TOKEN_EXPIRED_IN || '300', 10) * 1000;
     const token = jwt.sign(
-      { _id: user._id },
-      process.env.JWT_SECRET
+      { 
+        _id: user._id,
+        username: user.username
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: Number(process.env.TOKEN_EXPIRED_IN)
+      }
     );
     // persist the token as 't' in cookie with expiry date
     res.cookie('t', token, { expire: new Date() + 9999 });

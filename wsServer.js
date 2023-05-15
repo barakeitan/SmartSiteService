@@ -1,8 +1,8 @@
 var webSocketServer = require('websocket').server;
-const wsServerPort = process.env.wsServerPort || 6835;
+const wsServerPort = process.env.WS_PORT || 6835;
 var server = require('http').createServer().listen(wsServerPort);
 var wsServer = new webSocketServer({httpServer: server});
-console.log("wss is working");
+console.log(`wss is listening on port ${wsServerPort}`);
 
 const clients = {};
 
@@ -65,7 +65,7 @@ module.exports = { clients: clients, broadcast };
 
 //   wsServer.on('connection', (connection) => {
 //     console.log('New Client connected');
-//     const clientId = uuidv4();
+    // const clientId = uuidv4();
 //     clients[clientId] = { connection, clientId };
 
 //     connection.on('close', () => {

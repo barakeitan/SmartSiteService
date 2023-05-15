@@ -6,11 +6,13 @@ const {
   signin,
   signout,
   requireSignin,
+  GenerateNewAccessToken
 } = require('../controllers/auth');
-const { userSignupValidator } = require('../../validator');
+const { userSignupValidator } = require('../helpers/validator');
 
 router.post('/signup', userSignupValidator, signup);
 router.post('/signin', signin);
 router.get('/signout', signout);
+router.post('/refreshToken', GenerateNewAccessToken)
 
 module.exports = router;

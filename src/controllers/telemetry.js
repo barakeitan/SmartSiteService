@@ -1,6 +1,6 @@
 const http = require("http");
 
-exports.get_all_telemetry = (req, res) => {
+exports.getAllTelemetry = (req, res) => {
     const options = {
         hostname: "127.0.0.1",
         port: 8001,

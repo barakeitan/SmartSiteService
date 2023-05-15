@@ -10,7 +10,7 @@ require('dotenv').config();
 // import routes
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/user');
-const telemetryReoutes = require("./routes/telemetry");
+const telemetryReoutes = require("./src/routes/telemetry");
 const { clients, broadcast } = require("./wsServer");
 
 // app

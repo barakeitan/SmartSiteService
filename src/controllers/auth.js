@@ -2,6 +2,8 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken'); // to generate signed token
 const expressJwt = require('express-jwt'); // for auth check
 const { errorHandler } = require('../helpers/dbErrorHandler');
+const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 
 require('dotenv').config();
 
@@ -21,6 +23,78 @@ exports.signup = (req, res) => {
   });
 };
 
+exports.GenerateNewAccessToken = (req, res) => {
+  const refreshToken = req.body.refreshToken;
+  // const username = req.body.username;
+  const email = req.body.email;
+
+  User.findOne({ email: email }, (err, user) => {
+    if (!refreshToken) {
+      return res.status(401).send('Refresh token not provided');
+    }
+  
+    // Check if refresh token is valid
+    const validRefreshToken = checkRefreshToken(refreshToken);
+  
+    if (!validRefreshToken) {
+      return res.status(403).send('Invalid refresh token');
+    }
+  
+    const { _id, name, email, role } = user;
+    // Generate new access token
+    // generate a signed token with user id and secret
+    const accessToken = jwt.sign(
+      { 
+        user: { _id, email, name, role }, 
+        // expiration: Number(new Date() + parseInt(process.env.TOKEN_EXPIRED_IN))
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: Number(process.env.TOKEN_EXPIRED_IN)
+      }
+    );
+  
+      // const newRefreshToken = uuidv4();
+      // user.hashed_refreshToken = user.encryptRefreshToken(newRefreshToken);
+  
+      // Store refresh token in database
+      // storeRefreshToken(res, user);
+      // const accessToken = jwt.sign({ username: username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+    
+      // Send new access token in response
+      res.json({ accessToken });
+  });
+}
+
+exports.checkRefreshToken = (refreshToken, email, callback) => {
+  // Find the refresh token document for the given email
+  User.findOne({ email: email }, (err, user) => {
+    if (err) {
+      console.log(err);
+      callback(false);
+    } else {
+      if (user) {
+        // Compare the given refresh token to the hashed token stored in the database
+        bcrypt.compare(refreshToken, user.hashed_refreshToken, (err, result) => {
+          if (err) {
+            console.log(err);
+            callback(false);
+          } else {
+            if (result) {
+              callback(true);
+            } else {
+              callback(false);
+            }
+          }
+        });
+      } else {
+        callback(false);
+      }
+    }
+  });
+}
+
+
 exports.signin = (req, res) => {
   // find the user based on email
   const { email, password } = req.body;
@@ -32,32 +106,78 @@ exports.signin = (req, res) => {
     }
     // if user found make sure the email and password match
     // create authenticate method in user model
-    if (!user.authenticate(password)) {
+    if (!user.authenticate(password, user.email)) {
       return res.status(401).json({
-        error: "Email and password didn't match",
+        error: "Invalid email or password",
       });
     }
+    const { _id, name, email, role } = user;
     // generate a signed token with user id and secret
-    // const tokenExpiration =
-    //         Number((new Date().getTime() / 1000).toFixed()) +
-    //         parseInt(process.env.TOKEN_EXPIRED_IN || '300', 10) * 1000;
-    const token = jwt.sign(
+    const tokenExpiration =
+            Number((new Date().getTime() / 1000).toFixed()) +
+            parseInt(process.env.TOKEN_EXPIRED_IN || '300', 10) * 1000;
+    const accessToken = jwt.sign(
       { 
-        _id: user._id,
-        username: user.username
+        user: { _id, email, name, role },        
+        // expiration: tokenExpiration || Number(new Date() + process.env.TOKEN_EXPIRED_IN)
       },
-      process.env.JWT_SECRET,
+      process.env.ACCESS_TOKEN_SECRET,
       {
-        expiresIn: Number(process.env.TOKEN_EXPIRED_IN)
+        expiresIn:  (''+process.env.TOKEN_EXPIRED_IN + 'm')
       }
     );
-    // persist the token as 't' in cookie with expiry date
-    res.cookie('t', token, { expire: new Date() + 9999 });
+    const refreshToken = uuidv4();
+    const encryptRefreshToken = user.encryptRefreshToken(refreshToken);
+    user.hashed_refreshToken = encryptRefreshToken.token;
+
+    // Store refresh token in database
+    storeRefreshToken(res, user);
+
     // return response with user and token to frontend client
-    const { _id, name, email, role } = user;
-    return res.json({ token, user: { _id, email, name, role } });
+    
+    return res.json({ accessToken, refreshToken, user: { _id, email, name, role } });
   });
 };
+
+function storeRefreshToken(res, user) {
+  // Store refresh token in database
+  // const user = new User(user);
+
+  User.findOneAndUpdate(
+    { email: user.email },
+    { $set: user },
+    { new: true },
+    (err, user) => {
+      if (err) {
+        return res.status(400).json({
+          error: 'You are not authorized to perform this action',
+        });
+      }
+    }
+  );
+  
+  // User.save((err, user) => {
+  //   if (err) {
+  //     return res.status(400).json({
+  //       err: errorHandler(err),
+  //     });
+  //   }else {
+  //     console.log('Refresh token stored in database');
+  //   }
+  // });
+
+  // db.collection('refreshTokens').insertOne({
+  //   token: refreshToken,
+  //   email: email
+  // }, (err, result) => {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log('Refresh token stored in database');
+  //   }
+  // });
+}
+
 
 exports.signout = (req, res) => {
   res.clearCookie('t');
@@ -65,7 +185,7 @@ exports.signout = (req, res) => {
 };
 
 exports.requireSignin = expressJwt({
-  secret: process.env.JWT_SECRET,
+  secret: process.env.ACCESS_TOKEN_SECRET,
   // algorithms: ['RS256'],
   userProperty: 'auth',
 });

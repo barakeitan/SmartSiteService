@@ -18,7 +18,7 @@
             "request": "launch",
             "name": "Debug ts in Node.js",
             "preLaunchTask": "typescript",
-            "program": "${workspaceFolder}/src/server.ts",
+            "program": "${workspaceFolder}/server.js",
             "cwd": "${workspaceFolder}",
             "protocol": "inspector",
             "console": "integratedTerminal",

@@ -5,12 +5,18 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
+const axios = require('axios');
 const expressValidator = require('express-validator');
 require('dotenv').config();
 // import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const telemetryReoutes = require("./routes/telemetry");
+
+// Telemetry variables
+let cpuAvg = 0;
+let diskAvg = 0;
+let memAvg = 0;
 
 // app
 const app = express();
@@ -77,6 +83,35 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
   });
 }
+
+const sampleTelemetryInfo = async () =>
+{
+  try {
+    //get the latest three lines   
+    const response = await axios.get('http://127.0.0.1:3007/api/telemetry');
+    let records = response.data;
+    
+    for (let i = 0; i < records.data.length; i++) {
+      const record = JSON.parse(records.data[i].replace(/'/g, `"`));
+
+      cpuAvg  += Number(record.cpu);
+      diskAvg += Number(record.disk);
+      memAvg  += Number(record.memory);
+    }
+    cpuAvg = cpuAvg / (records.data.length + 1);
+    diskAvg = diskAvg / (records.data.length + 1);
+    memAvg = memAvg / (records.data.length + 1)
+
+    console.log('cpu avg  : ' + cpuAvg);
+    console.log('disk avg : ' + diskAvg);
+    console.log('mem avg  : ' + memAvg);
+  } catch (err) {
+    console.error(err);
+  }
+
+  setTimeout(sampleTelemetryInfo, 10000);
+};
+sampleTelemetryInfo();
 
 const PORT = process.env.PORT || 3002;
 

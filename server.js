@@ -9,9 +9,10 @@ const axios = require('axios');
 const expressValidator = require('express-validator');
 require('dotenv').config();
 // import routes
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/user');
-const telemetryReoutes = require("./routes/telemetry");
+const authRoutes = require('./src/routes/auth');
+const userRoutes = require('./src/routes/user');
+const telemetryReoutes = require("./src/routes/telemetry");
+const { clients, broadcast } = require("./wsServer");
 
 // Telemetry variables
 let cpuAvg = 0;

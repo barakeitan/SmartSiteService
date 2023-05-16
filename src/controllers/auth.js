@@ -53,14 +53,6 @@ exports.GenerateNewAccessToken = (req, res) => {
         expiresIn: Number(process.env.TOKEN_EXPIRED_IN)
       }
     );
-  
-      // const newRefreshToken = uuidv4();
-      // user.hashed_refreshToken = user.encryptRefreshToken(newRefreshToken);
-  
-      // Store refresh token in database
-      // storeRefreshToken(res, user);
-      // const accessToken = jwt.sign({ username: username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-    
       // Send new access token in response
       res.json({ accessToken });
   });
@@ -155,27 +147,6 @@ function storeRefreshToken(res, user) {
       }
     }
   );
-  
-  // User.save((err, user) => {
-  //   if (err) {
-  //     return res.status(400).json({
-  //       err: errorHandler(err),
-  //     });
-  //   }else {
-  //     console.log('Refresh token stored in database');
-  //   }
-  // });
-
-  // db.collection('refreshTokens').insertOne({
-  //   token: refreshToken,
-  //   email: email
-  // }, (err, result) => {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     console.log('Refresh token stored in database');
-  //   }
-  // });
 }
 
 

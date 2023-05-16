@@ -50,7 +50,7 @@ exports.GenerateNewAccessToken = (req, res) => {
       },
       process.env.ACCESS_TOKEN_SECRET,
       {
-        expiresIn: Number(process.env.TOKEN_EXPIRED_IN)
+        expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRED_IN)
       }
     );
       // Send new access token in response
@@ -105,9 +105,9 @@ exports.signin = (req, res) => {
     }
     const { _id, name, email, role } = user;
     // generate a signed token with user id and secret
-    const tokenExpiration =
-            Number((new Date().getTime() / 1000).toFixed()) +
-            parseInt(process.env.TOKEN_EXPIRED_IN || '300', 10) * 1000;
+    // const tokenExpiration =
+    //         Number((new Date().getTime() / 1000).toFixed()) +
+    //         parseInt(process.env.ACCESS_TOKEN_EXPIRED_IN || '300', 10) * 1000;
     const accessToken = jwt.sign(
       { 
         user: { _id, email, name, role },        
@@ -115,7 +115,7 @@ exports.signin = (req, res) => {
       },
       process.env.ACCESS_TOKEN_SECRET,
       {
-        expiresIn:  (''+process.env.TOKEN_EXPIRED_IN + 'm')
+        expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRED_IN)
       }
     );
     const refreshToken = uuidv4();

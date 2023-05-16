@@ -56,7 +56,7 @@ exports.checkAccessToken = (req, res, next) => {
 
         if (decoded.exp - process.env.RENEW_TOKEN_BEFORE_EXPIRED < Date.now() / 1000) {
           // Generate new access token
-          const accessToken = jwt.sign({ username: validRefreshToken.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: Number(process.env.TOKEN_EXPIRED_IN) });
+          const accessToken = jwt.sign({ username: validRefreshToken.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRED_IN) });
 
           // Set new access token in response header
           res.set('Authorization', `Bearer ${accessToken}`);

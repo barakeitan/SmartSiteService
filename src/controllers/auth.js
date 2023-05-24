@@ -12,7 +12,7 @@ exports.signup = (req, res) => {
   user.save((err, user) => {
     if (err) {
       return res.status(400).json({
-        err: errorHandler(err),
+        error: "There was an error save your user in DB. Please try again later.",
       });
     }
     user.salt = undefined;
@@ -42,7 +42,6 @@ exports.GenerateNewAccessToken = (req, res) => {
   
     const { _id, name, email, role } = user;
     // Generate new access token
-    // generate a signed token with user id and secret
     const accessToken = jwt.sign(
       { 
         user: { _id, email, name, role }, 
@@ -97,7 +96,6 @@ exports.signin = (req, res) => {
       });
     }
     // if user found make sure the email and password match
-    // create authenticate method in user model
     if (!user.authenticate(password, user.email)) {
       return res.status(401).json({
         error: "Invalid email or password",
@@ -105,13 +103,9 @@ exports.signin = (req, res) => {
     }
     const { _id, name, email, role } = user;
     // generate a signed token with user id and secret
-    // const tokenExpiration =
-    //         Number((new Date().getTime() / 1000).toFixed()) +
-    //         parseInt(process.env.ACCESS_TOKEN_EXPIRED_IN || '300', 10) * 1000;
     const accessToken = jwt.sign(
       { 
-        user: { _id, email, name, role },        
-        // expiration: tokenExpiration || Number(new Date() + process.env.TOKEN_EXPIRED_IN)
+        user: { _id, email, name, role },
       },
       process.env.ACCESS_TOKEN_SECRET,
       {
@@ -133,8 +127,6 @@ exports.signin = (req, res) => {
 
 function storeRefreshToken(res, user) {
   // Store refresh token in database
-  // const user = new User(user);
-
   User.findOneAndUpdate(
     { email: user.email },
     { $set: user },
@@ -157,7 +149,6 @@ exports.signout = (req, res) => {
 
 exports.requireSignin = expressJwt({
   secret: process.env.ACCESS_TOKEN_SECRET,
-  // algorithms: ['RS256'],
   userProperty: 'auth',
 });
 

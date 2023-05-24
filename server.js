@@ -13,6 +13,7 @@ const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/user');
 const telemetryReoutes = require("./src/routes/telemetry");
 const { clients, broadcast } = require("./wsServer");
+// const { getAllTelemetry } = require("./src/controllers/telemetry");
 
 // Telemetry variables
 let cpuAvg = 0;
@@ -102,7 +103,10 @@ const sampleTelemetryInfo = async () =>
 {
   try {
     //get the latest three lines   
+    // const response = await axios.get('http://127.0.0.1:3007/api/telemetry');
+    // const response = getAllTelemetry()
     const response = await axios.get('http://127.0.0.1:3007/api/telemetry');
+
     let records = response.data;
     let cpu_rec = disk_rec = mem_rec = 0;
     let cpu_std = disk_std = mem_std = 0;

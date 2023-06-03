@@ -210,7 +210,7 @@ const updateStatusInGeneral = async () => {
         sites.forEach(async site => {
             const rooms = await Room.find({ siteId: site._id }).exec();
             let site_maxStatus = "0";
-            rooms.forEach(room => {
+            rooms.forEach(async room => {
                 const sensors = await Sensor.find({ roomId: room._id }).exec();
                 let sensors_maxStatus = "0";
                 sensors.forEach(async sensor => {

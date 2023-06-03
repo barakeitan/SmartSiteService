@@ -12,6 +12,7 @@ require('dotenv').config();
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/user');
 const telemetryReoutes = require("./src/routes/telemetry");
+const routes = require('./src/routes');
 const { clients, broadcast } = require("./wsServer");
 // const { getAllTelemetry } = require("./src/controllers/telemetry");
 
@@ -56,6 +57,7 @@ app.use(cors());
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
 app.use('/api',telemetryReoutes);
+app.use('/api',routes);
 
 if (process.env.NODE_ENV == "development") {
     const swaggerUI = require("swagger-ui-express")

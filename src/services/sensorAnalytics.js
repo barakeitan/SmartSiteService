@@ -14,7 +14,7 @@ setInterval(updateStatusInGeneral, 3000);
 async function main() {
     try {
         const rooms = await Room.find({}).exec();
-        rooms.forEach(room => {
+        rooms.forEach( async room => {
             const sensors = await Sensor.find({ roomId: room._id }).populate("sensorTypeId").exec();
             sensors.forEach(sensor => {
                 checkAlerts(room, sensor, sensor.sensorTypeId);
@@ -210,7 +210,7 @@ const updateStatusInGeneral = async () => {
         sites.forEach(async site => {
             const rooms = await Room.find({ siteId: site._id }).exec();
             let site_maxStatus = "0";
-            rooms.forEach(room => {
+            rooms.forEach(async room => {
                 const sensors = await Sensor.find({ roomId: room._id }).exec();
                 let sensors_maxStatus = "0";
                 sensors.forEach(async sensor => {

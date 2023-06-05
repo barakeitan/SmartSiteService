@@ -14,7 +14,7 @@ setInterval(updateStatusInGeneral, 3000);
 async function main() {
     try {
         const rooms = await Room.find({}).exec();
-        rooms.forEach(room => {
+        rooms.forEach(async room => {
             const sensors = await Sensor.find({ roomId: room._id }).populate("sensorTypeId").exec();
             sensors.forEach(sensor => {
                 checkAlerts(room, sensor, sensor.sensorTypeId);

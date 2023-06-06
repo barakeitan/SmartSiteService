@@ -4,7 +4,7 @@ const SensorType = require("../../models/sensorType.model");
 const utf8 = require("utf8");
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-export const sendMessage = async (room, sensor, malfunctionTypeId) => {
+exports.sendMessage = async (room, sensor, malfunctionTypeId) => {
     try {
         let endpoint = "https://api.telegram.org/bot%token/sendMessage?chat_id=%chatId&text=%message";
         let message = "url% :קישור לחדר החיישן .sensor% בחיישן room&בחדר site% ישנה תקלה באתר";

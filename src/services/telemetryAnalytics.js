@@ -1,4 +1,5 @@
 const axios = require('axios');
+const {handle_telemetry_update} = require('../services/sensorAnalytics');
 
 // Telemetry variables
 let cpuAvg = 0;
@@ -63,12 +64,9 @@ exports.sampleTelemetryInfo = async () =>
     console.log('cpu avg  : ' + cpuAvg);
     console.log('disk avg : ' + diskAvg);
     console.log('mem avg  : ' + memAvg);
+
+    handle_telemetry_update(record)
   } catch (err) {
     console.error(err);
   }
-
-//   setTimeout(sampleTelemetryInfo, 3000);
 };
-
-
-// sampleTelemetryInfo();

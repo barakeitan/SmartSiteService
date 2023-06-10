@@ -402,5 +402,24 @@ function check_sound_warning() {
 }
 
 function check_sound_danger() {
+    //alert that many computers are working hard
+    let cpu_sensor = default_sensors.find((obj)=> obj["sensorType"]["name"] == "Cpu Sensor");
+    let cpu_zone = checkZone(cpu_sensor.sensorData, cpu_sensor.sensorType["minValue"], cpu_sensor.sensorType["maxValue"]);
+    
+    //check temperature, if up so malf room is heating up...
+    let temp_sensor = default_sensors.find((obj)=> obj["sensorType"]["name"] == "Temperature Sensor");
+    let temp_zone = checkZone(temp_sensor.sensorData, temp_sensor.sensorType["minValue"], temp_sensor.sensorType["maxValue"]);
 
+    if(cpu_zone > 1)
+    {
+        let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Sound danger");
+        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorType"]["name"] == "Sound Sensor"),
+        malf._id, "DANGER : ", "");
+    }
+    else
+    {
+        let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Sound warning");
+        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorType"]["name"] == "Sound Sensor"),
+        malf._id, "DANGER : ", "");// TODO: add severity to the malfunctions
+    }
 }

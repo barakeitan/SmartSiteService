@@ -311,7 +311,21 @@ exports.handle_telemetry_update = (telemetry_update) => {
     }
 
 function check_cpu_warning() {
+    // check memory - if up send warning heavy process if not bad process
+    let zone = checkZone(global_telemetry_data["memory"], 0, 100);
+    let heavy_malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU warning heavy process")
+    let bad_malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU warning bad process")
+    if(zone > 1)
+    {
 
+        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorType"]["name"] == "Cpu Sensor"),
+        heavy_malf._id, "WARNING : ", "");
+    }
+    else
+    {
+        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorType"]["name"] == "Cpu Sensor"),
+        bad_malf._id, "WARNING : ", "");
+    }
 }
 
 function check_cpu_danger() {

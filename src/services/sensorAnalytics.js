@@ -395,7 +395,10 @@ function check_temperature_danger() {
 }
 
 function check_sound_warning() {
-
+    // alert that one of the computers are working hard
+    let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Sound warning");
+    insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorType"]["name"] == "Sound Sensor"),
+    malf._id, "WARNING : ", "");
 }
 
 function check_sound_danger() {

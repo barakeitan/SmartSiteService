@@ -20,6 +20,13 @@ exports.start_intervals = async () => {
     setInterval(main, 3000);
 }
 
+// This should be temporary
+const default_room_id = "647b44a207ab16da82a6a0ca";
+
+const default_sensors = [];
+
+//this is the telemetry data, updates every 3 seconds 
+const global_telemetry_data={}
 
 const mappings = {
     "cpu_sensor": {

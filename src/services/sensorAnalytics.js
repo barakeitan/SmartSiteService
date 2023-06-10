@@ -353,7 +353,23 @@ function check_cpu_danger() {
 }
 
 function check_temperature_warning() {
+    //check sound, if up then maybe fans work too much, if down then problem AC, if not changed then other problem
+    //alert the result as warning
+    let sound_sensor = default_sensors.find((obj)=> obj["sensorType"]["name"] == "Sound Sensor");
+    let sound_zone = checkZone(sound_sensor.sensorData, sound_sensor.sensorType["minValue"], sound_sensor.sensorType["maxValue"]);
 
+    if(sound_zone > 1)
+    {
+        let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperture warning");
+        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorType"]["name"] == "Temperature Sensor"),
+        malf._id, "WARNING : ", "or the fans started working too hard");
+    }
+    else
+    {
+        let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperture warning");
+        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorType"]["name"] == "Temperature Sensor"),
+        malf._id, "WARNING : ", "");
+    }
 }
 
 function check_temperature_danger() {

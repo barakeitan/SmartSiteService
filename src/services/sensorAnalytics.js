@@ -7,11 +7,17 @@ const Room = require("../models/room.model");
 const Malfunction = require("../models/malfunction.model");
 const { sendMessage } = require("../helpers/messages/telegram");
 const { sampleTelemetryInfo } = require("./telemetryAnalytics");
+const { DataType } = require("../helpers/enums/dataType.enum");
+const sensorType = require("../models/sensorType.model");
+const MalfunctionType = require("../models/malfunctionType.model");
 
-exports.start_intervals = () => {
-    setInterval(main, 3000);
+const malfunctionsTypes = [];
+
+exports.start_intervals = async () => {
+    malfunctionsTypes = await MalfunctionType.find({}).exec();
     setInterval(sampleTelemetryInfo, 3000)
     setInterval(updateStatusInGeneral, 3000);
+    setInterval(main, 3000);
 }
 
 

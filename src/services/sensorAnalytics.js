@@ -198,7 +198,7 @@ function checkAlerts(room, sensor, sensor_type, dataType ) {
  *              If not entered, then it enters a new malfunction
  *              and sends a Telegram message to the customer about the malfunction
  */
-function check_if_exists_last_hour(room, sensor, malfunctionTypeId, message, analyticsCallback) {
+function check_if_exists_last_hour(room, sensor, malfunctionTypeId, message, severity, analyticsCallback) {
     const currentDate = new Date();
     currentDate.setTime(
         currentDate.getTime() - new Date().getTimezoneOffset() * 60 * 1000
@@ -217,7 +217,7 @@ function check_if_exists_last_hour(room, sensor, malfunctionTypeId, message, ana
             if (!malfunctions[0]) {
                 //if there is no malfunction within the last hour in sensor and
                 //his mal_type then insert a new one
-                insertMalfunction(room, sensor, malfunctionTypeId, message);
+                insertMalfunction(room, sensor, malfunctionTypeId, message, severity);
                 sendMessage(room, sensor, malfunctionTypeId);
                 analyticsCallback();
             }

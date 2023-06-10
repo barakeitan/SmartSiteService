@@ -234,7 +234,7 @@ function check_if_exists_last_hour(room, sensor, malfunctionTypeId, message, sev
  * @param {*} message 
  * insert new malfunction to the system
  */
-function insertMalfunction(room, sensor, malfunctionTypeId, message) {
+function insertMalfunction(room, sensor, malfunctionTypeId, message, severity) {
     let currentDate = new Date();
     currentDate.setTime(
         currentDate.getTime() - new Date().getTimezoneOffset() * 60 * 1000
@@ -249,6 +249,7 @@ function insertMalfunction(room, sensor, malfunctionTypeId, message) {
                 date: currentDate,
                 malfunctionTypeId: malfunctionTypeId,
                 recent_data: record.sensorData,
+                severity: severity,
                 message: message,
             });
             malfunction.save();

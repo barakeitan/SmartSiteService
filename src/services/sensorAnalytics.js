@@ -373,7 +373,25 @@ function check_temperature_warning() {
 }
 
 function check_temperature_danger() {
+    // same as the warning just in result
+    let sound_sensor = default_sensors.find((obj)=> obj["sensorType"]["name"] == "Sound Sensor");
+    let sound_zone = checkZone(sound_sensor.sensorData, sound_sensor.sensorType["minValue"], sound_sensor.sensorType["maxValue"]);
+    
+    let cpu_sensor = default_sensors.find((obj)=> obj["sensorType"]["name"] == "Cpu Sensor");
+    let cpu_zone = checkZone(cpu_sensor.sensorData, cpu_sensor.sensorType["minValue"], cpu_sensor.sensorType["maxValue"]);
 
+    if(sound_zone > 1 || cpu_zone > 1)
+    {
+        let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperature fans danger");
+        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorType"]["name"] == "Temperature Sensor"),
+        malf._id, "DANGER : ", "");
+    }
+    else
+    {
+        let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperture danger");
+        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorType"]["name"] == "Temperature Sensor"),
+        malf._id, "DANGER : ", "");
+    }
 }
 
 function check_sound_warning() {

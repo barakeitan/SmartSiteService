@@ -146,7 +146,7 @@ function updateSensorStatus(sensor, status) {
 * @param {sensr_type object} sensor_type
 * @description Checks the data of the sensors in each room and their integrity and alerts accordingly 
 */
-function checkAlerts(room, sensor, sensor_type, telemetryData) {
+function checkAlerts(room, sensor, sensor_type, dataType ) {
     let message = '';
     switch (
     checkZone(
@@ -165,6 +165,7 @@ function checkAlerts(room, sensor, sensor_type, telemetryData) {
                 sensor,
                 process.env.SENSOR_DATA_EXEPTION,
                 message,
+                "WARNING : ",
                 mappings[sensor_type["name"]]["warning"]
             );
             updateSensorStatus(sensor, "2");
@@ -176,6 +177,7 @@ function checkAlerts(room, sensor, sensor_type, telemetryData) {
                 sensor,
                 process.env.SENSOR_DATA_ONGOING_EXEPTION,
                 message,
+                "DANGER : ",
                 mappings[sensor_type["name"]]["danger"]
             );
             updateSensorStatus(sensor, "3");

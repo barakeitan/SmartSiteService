@@ -300,12 +300,15 @@ const updateStatusInGeneral = async () => {
 /**
  * 
  * @param {*} update the json object containing the update
- * @description handles the data from the telemetry by checking the possible zones and determines 
- * if there was an alert
+ * @description saves the last read from the telemetry
  */
-function handle_update(update) {
-
-}
+exports.handle_telemetry_update = (telemetry_update) => {
+    for (const key in telemetry_update) {
+        if (telemetry_update.hasOwnProperty(key)) {
+          global_telemetry_data[key] = telemetry_update[key];
+        }
+      }
+    }
 
 function check_cpu_warning() {
 

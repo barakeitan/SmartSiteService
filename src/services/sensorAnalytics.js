@@ -329,7 +329,27 @@ function check_cpu_warning() {
 }
 
 function check_cpu_danger() {
+    //check mem - if up display busy task if not malf program error
+    let mem_zone = checkZone(global_telemetry_data["memory"], 0, 100);
+    //check temp - if up then alert to close the task if not so it is less dangerous
+    let temp_sensor = default_sensors.find((obj)=> obj["sensorType"]["name"] == "Temperature Sensor");
+    let temp_zone = checkZone(temp_sensor.sensorData, temp_sensor.sensorType["minValue"], temp_sensor.sensorType["maxValue"]);
+    //check sound - if up then vintelator is on if not so you still have time to fix it 
+    let sound_sensor = default_sensors.find((obj)=> obj["sensorType"]["name"] == "Sound Sensor");
+    let sound_zone = checkZone(sound_sensor.sensorData, sound_sensor.sensorType["minValue"], sound_sensor.sensorType["maxValue"]);
 
+    if(sound_zone > 1)
+    {
+        let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger fans");
+        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorType"]["name"] == "Cpu Sensor"),
+        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data["process"]);
+    }
+    else
+    {
+        let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger hot");
+        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorType"]["name"] == "Cpu Sensor"),
+        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data["process"]);
+    }
 }
 
 function check_temperature_warning() {

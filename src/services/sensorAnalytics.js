@@ -61,11 +61,14 @@ async function main() {
         const rooms = await Room.find({}).exec();
         rooms.forEach(async room => {
             const sensors = await Sensor.find({ roomId: room._id }).populate("sensorTypeId").exec();
-            const telemetryData = await sampleTelemetryInfo();
+            if(room._id == default_room_id)
+            {
+                default_sensors = Array.from(sensors);
+            }
             sensors.forEach(sensor => {
-                checkAlerts(room, sensor, sensor.sensorTypeId, telemetryData);
+                checkAlerts(room, sensor, sensor.sensorTypeId, DataType.SENSOR);
             });
-            
+            checkAlerts(room, null, null, DataType.TELEMETRY);
         })
     } catch (error) {
         console.log(error);

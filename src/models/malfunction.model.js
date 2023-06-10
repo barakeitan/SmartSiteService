@@ -5,6 +5,7 @@ const malfunctionSchema = new Schema({
     sensorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Sensor' },
     malfunctionTypeId: { type: mongoose.Schema.Types.ObjectId, ref: 'MalfunctionType' },
     date: {type: Date, default : Date.now()},
+    severity: String,
     recent_data: String,
     message: String //a message from the server or from the raspberry pie
 });

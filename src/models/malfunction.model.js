@@ -8,5 +8,5 @@ const malfunctionSchema = new Schema({
     recent_data: { type: String },
     message: { type: String }//a message from the server or from the raspberry pie
 });
-const Malfunction = mongoose.model("Malfunction", malfunctionSchema);
+const Malfunction = mongoose.model("Malfunction", malfunctionSchema, "Malfunction");
 module.exports = Malfunction;

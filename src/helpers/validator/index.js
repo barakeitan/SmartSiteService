@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
- const { checkRefreshToken } = require('../../controllers/auth');
+ const { checkRefreshToken } = require('../../controllers/auth.controller');
 
 exports.userSignupValidator = (req, res, next) => {
   req.check('name', 'Name is required').notEmpty();
@@ -30,7 +30,6 @@ exports.userSignupValidator = (req, res, next) => {
 exports.checkAccessToken = (req, res, next) => {
   const accessToken = req.headers.authorization;
 
-
   // If access token is missing
   if (!accessToken) {
     return res.status(401).json({ error: 'Access token missing' });
@@ -54,7 +53,8 @@ exports.checkAccessToken = (req, res, next) => {
           return res.status(403).send('Invalid refresh token');
         }
 
-        if (decoded.exp - process.env.RENEW_TOKEN_BEFORE_EXPIRED < Date.now() / 1000) {
+        // if (decoded.exp - process.env.RENEW_TOKEN_BEFORE_EXPIRED < Date.now() / 1000) {
+          if (decoded.exp && (Math.floor(Date.now() / 1000) - decoded.exp) > process.env.ACCESS_TOKEN_EXPIRED_IN) {
           // Generate new access token
           const accessToken = jwt.sign({ username: validRefreshToken.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRED_IN) });
 

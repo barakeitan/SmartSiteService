@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 const roomSchema = new Schema({
     name: { type: String },
     siteId: { type: mongoose.Schema.Types.ObjectId, ref: 'Site' },
-    status: { type: String }
+    status: { type: String },
+    imagePath: { type: String }
 });
 const Room = mongoose.model("Room", roomSchema);
 module.exports = Room;

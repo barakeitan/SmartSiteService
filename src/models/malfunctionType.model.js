@@ -4,5 +4,5 @@ const malfunction_typeSchema = new Schema({
     malfunctionTypeName: String,
     riskDescription: String,
 });
-const MalfunctionType = mongoose.model("MalfunctionType", malfunction_typeSchema);
+const MalfunctionType = mongoose.model("MalfunctionType", malfunction_typeSchema, "MalfunctionType");
 module.exports = MalfunctionType;

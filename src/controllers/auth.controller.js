@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../models/user.model');
 const jwt = require('jsonwebtoken'); // to generate signed token
 const expressJwt = require('express-jwt'); // for auth check
 const { errorHandler } = require('../helpers/dbErrorHandler');
@@ -12,7 +12,7 @@ exports.signup = (req, res) => {
   user.save((err, user) => {
     if (err) {
       return res.status(400).json({
-        err: errorHandler(err),
+        error: "There was an error save your user in DB. Please try again later.",
       });
     }
     user.salt = undefined;
@@ -22,6 +22,41 @@ exports.signup = (req, res) => {
     });
   });
 };
+
+exports.isAuthenticate = (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  // If access token is missing
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Unauthorized: No token provided' });
+  }
+
+  // Split the Authorization header value to extract the token
+  const [bearer, token] = authHeader.split(' ');
+
+  // Check if the Authorization header format is valid
+  if (bearer !== 'Bearer' || token == 'null') {
+    return res.status(401).json({ message: 'Unauthorized: Invalid token format' });
+  }
+  // const accessToken = token.replace(/^'|'$/g, '"');
+  const accessToken = token.slice(1, -1);
+
+  try {
+    // Verify access token
+    jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+      }
+        if (decoded.exp && (Math.floor(Date.now() / 1000) - decoded.exp) > process.env.ACCESS_TOKEN_EXPIRED_IN) {
+          res.json({isAuthenticate: false});
+        }
+        console.log('user is authenticated and allowed to pass to the desired route');
+      res.json({isAuthenticate: true});
+    });
+  } catch (error) {
+    return res.status(403).json({ error: 'Invalid access token' });
+  }
+}
 
 exports.GenerateNewAccessToken = (req, res) => {
   const refreshToken = req.body.refreshToken;
@@ -42,7 +77,6 @@ exports.GenerateNewAccessToken = (req, res) => {
   
     const { _id, name, email, role } = user;
     // Generate new access token
-    // generate a signed token with user id and secret
     const accessToken = jwt.sign(
       { 
         user: { _id, email, name, role }, 
@@ -97,7 +131,6 @@ exports.signin = (req, res) => {
       });
     }
     // if user found make sure the email and password match
-    // create authenticate method in user model
     if (!user.authenticate(password, user.email)) {
       return res.status(401).json({
         error: "Invalid email or password",
@@ -105,13 +138,9 @@ exports.signin = (req, res) => {
     }
     const { _id, name, email, role } = user;
     // generate a signed token with user id and secret
-    // const tokenExpiration =
-    //         Number((new Date().getTime() / 1000).toFixed()) +
-    //         parseInt(process.env.ACCESS_TOKEN_EXPIRED_IN || '300', 10) * 1000;
     const accessToken = jwt.sign(
       { 
-        user: { _id, email, name, role },        
-        // expiration: tokenExpiration || Number(new Date() + process.env.TOKEN_EXPIRED_IN)
+        user: { _id, email, name, role },
       },
       process.env.ACCESS_TOKEN_SECRET,
       {
@@ -133,8 +162,6 @@ exports.signin = (req, res) => {
 
 function storeRefreshToken(res, user) {
   // Store refresh token in database
-  // const user = new User(user);
-
   User.findOneAndUpdate(
     { email: user.email },
     { $set: user },
@@ -149,15 +176,8 @@ function storeRefreshToken(res, user) {
   );
 }
 
-
-exports.signout = (req, res) => {
-  res.clearCookie('t');
-  res.json({ message: 'Signout success' });
-};
-
 exports.requireSignin = expressJwt({
   secret: process.env.ACCESS_TOKEN_SECRET,
-  // algorithms: ['RS256'],
   userProperty: 'auth',
 });
 

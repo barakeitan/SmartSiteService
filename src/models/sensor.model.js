@@ -7,5 +7,5 @@ const sensorSchema = new Schema({
     roomId: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
     status: String // 1 is ok 2 is warning and 3 is dangerous
 });
-const Sensor = mongoose.model("Sensor", sensorSchema);
+const Sensor = mongoose.model("Sensor", sensorSchema, "Sensor");
 module.exports = Sensor;

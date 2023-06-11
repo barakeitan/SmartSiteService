@@ -12,7 +12,7 @@ exports.getRecordBySensorId = async (req, res) => {
 
 exports.createRecord = async (req, res) => {
     try {
-        const record = await Record.create({ ...req.body }).exec();
+        const record = await new Record({ ...req.body }).save();
         const updatedSensor = await Sensor.findOneAndUpdate({ _id: req.body.sensorId, }, { sensorData: req.body.sensorData }, { new: true })
         res.status(200).json({ record, updatedSensor });
     } catch (error) {

@@ -6,19 +6,53 @@ const Record = require("../models/record.model");
 const Room = require("../models/room.model");
 const Malfunction = require("../models/malfunction.model");
 const { sendMessage } = require("../helpers/messages/telegram");
+const { sampleTelemetryInfo } = require("./telemetryAnalytics");
 
-setInterval(main, 3000);
-setInterval(updateStatusInGeneral, 3000);
+exports.start_intervals = () => {
+    setInterval(main, 3000);
+    setInterval(sampleTelemetryInfo, 3000)
+    setInterval(updateStatusInGeneral, 3000);
+}
+
+
+const mappings = {
+    "cpu_sensor": {
+        warning: () => {
+            check_cpu_warning();
+        },
+        danger: () => {
+            check_cpu_danger();
+        }
+    },
+    "temperature_sensor": {
+        warning: () => {
+            check_temperature_warning();
+        },
+        danger: () => {
+            check_temperature_danger();
+        }
+    },
+    "sound_sensor": {
+        warning: () => {
+            check_sound_warning();
+        },
+        danger: () => {
+            check_sound_danger();
+        }
+    }
+}
 
 
 async function main() {
     try {
         const rooms = await Room.find({}).exec();
-        rooms.forEach(room => {
+        rooms.forEach(async room => {
             const sensors = await Sensor.find({ roomId: room._id }).populate("sensorTypeId").exec();
+            const telemetryData = await sampleTelemetryInfo();
             sensors.forEach(sensor => {
                 checkAlerts(room, sensor, sensor.sensorTypeId);
             });
+            
         })
     } catch (error) {
         console.log(error);
@@ -113,8 +147,9 @@ function checkAlerts(room, sensor, sensor_type) {
             check_if_exists_last_hour(
                 room,
                 sensor,
-                process.env.SENSOR_DATA_EXEPTION,
-                message
+                process.env.SENSOR_DATA_EXCEPTION,
+                message,
+                mappings[sensor_type["name"]]["warning"]
             );
             updateSensorStatus(sensor, "2");
             break;
@@ -123,13 +158,16 @@ function checkAlerts(room, sensor, sensor_type) {
             check_if_exists_last_hour(
                 room,
                 sensor,
-                process.env.SENSOR_DATA_ONGOING_EXEPTION,
-                message
+                process.env.SENSOR_DATA_ONGOING_EXCEPTION,
+                message,
+                mappings[sensor_type["name"]]["danger"]
             );
             updateSensorStatus(sensor, "3");
             break;
     }
 }
+
+
 /**
  * 
  * @param {*} room 
@@ -142,7 +180,7 @@ function checkAlerts(room, sensor, sensor_type) {
  *              If not entered, then it enters a new malfunction
  *              and sends a Telegram message to the customer about the malfunction
  */
-function check_if_exists_last_hour(room, sensor, malfunctionTypeId, message) {
+function check_if_exists_last_hour(room, sensor, malfunctionTypeId, message, analyticsCallback) {
     const currentDate = new Date();
     currentDate.setTime(
         currentDate.getTime() - new Date().getTimezoneOffset() * 60 * 1000
@@ -163,6 +201,7 @@ function check_if_exists_last_hour(room, sensor, malfunctionTypeId, message) {
                 //his mal_type then insert a new one
                 insertMalfunction(room, sensor, malfunctionTypeId, message);
                 sendMessage(room, sensor, malfunctionTypeId);
+                analyticsCallback();
             }
         })
         .catch(err => {
@@ -238,3 +277,39 @@ const updateStatusInGeneral = async () => {
         console.log(error);
     }
 }
+
+/**
+ * 
+ * @param {*} update the json object containing the update
+ * @description handles the data from the telemetry by checking the possible zones and determines 
+ * if there was an alert
+ */
+function handle_update(update) {
+
+}
+
+function check_cpu_warning() {
+
+}
+
+function check_cpu_danger() {
+
+}
+
+function check_temperature_warning() {
+
+}
+
+function check_temperature_danger() {
+
+}
+
+function check_sound_warning() {
+
+}
+
+function check_sound_danger() {
+
+}
+
+module.exports = start_intervals;

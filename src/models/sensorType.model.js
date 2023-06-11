@@ -5,5 +5,5 @@ const sensor_typeSchema = new Schema({
     minValue: Number,
     maxValue: Number
 });
-const sensorType = mongoose.model("SensorType", sensor_typeSchema);
+const sensorType = mongoose.model("SensorType", sensor_typeSchema, "SensorType");
 module.exports = sensorType;

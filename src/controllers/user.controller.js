@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../models/user.model');
 const { errorHandler } = require('../helpers/dbErrorHandler');
 const { json } = require('body-parser');
 

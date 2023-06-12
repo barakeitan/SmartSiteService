@@ -9,17 +9,14 @@ const axios = require('axios');
 const expressValidator = require('express-validator');
 require('dotenv').config();
 // import routes
-const authRoutes = require('./src/routes/auth');
-const userRoutes = require('./src/routes/user');
+const authRoutes = require('./src/routes/auth.routes');
+const userRoutes = require('./src/routes/user.routes');
 const telemetryReoutes = require("./src/routes/telemetry");
 const routes = require('./src/routes');
-const { clients, broadcast } = require("./wsServer");
+const {sensorTypeSeeders,sensorsSeeders} = require("./src/seeders");
+const { broadcast } = require("./wsServer");
 const {start_intervals} = require('./src/services/sensorAnalytics')
 
-// Telemetry variables
-let cpuAvg = 0;
-let diskAvg = 0;
-let memAvg = 0;
 
 // app
 const app = express();
@@ -37,6 +34,8 @@ const connectDB = async () => {
       }
     );
     console.log('MongoDB Connected');
+    // await sensorTypeSeeders()
+    // await sensorsSeeders();
   } catch (err) {
     console.error(err.message);
     // exit process with failure

@@ -5,9 +5,9 @@ const malfunctionSchema = new Schema({
     sensorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Sensor' },
     malfunctionTypeId: { type: mongoose.Schema.Types.ObjectId, ref: 'MalfunctionType' },
     date: {type: Date, default : Date.now()},
-    severity: String,
-    recent_data: String,
-    message: String //a message from the server or from the raspberry pie
+    severity: { type: String },
+    recent_data: { type: String },
+    message: { type: String } //a message from the server or from the raspberry pie
 });
-const Malfunction = mongoose.model("Malfunction", malfunctionSchema);
+const Malfunction = mongoose.model("Malfunction", malfunctionSchema, "Malfunction");
 module.exports = Malfunction;

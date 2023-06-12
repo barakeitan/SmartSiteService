@@ -19,11 +19,11 @@ const userSchema = new mongoose.Schema(
     },
     hashed_password: {
       type: String,
-      required: true,
+      required: false,
     },
     hashed_refreshToken: {
       type: String,
-      required: true,
+      required: false,
     },
     salt: String,
     role: {
@@ -36,17 +36,6 @@ const userSchema = new mongoose.Schema(
 );
 
 // virtual field
-userSchema
-  .virtual('password')
-  .set(function (password) {
-    this._password = password;
-    this.salt = uuidv1();
-    this.hashed_password = this.encryptPassword(password);
-  })
-  .get(function () {
-    return this._password;
-  });
-
 userSchema
   .virtual('password')
   .set(function (password) {

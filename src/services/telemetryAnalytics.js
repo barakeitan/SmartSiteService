@@ -1,5 +1,5 @@
 const axios = require('axios');
-const {handle_telemetry_update} = require('../services/sensorAnalytics');
+const { handle_telemetry_update } = require('./sensorAnalytics');
 
 // Telemetry variables
 let cpuAvg = 0;
@@ -29,6 +29,7 @@ exports.sampleTelemetryInfo = async () =>
     let cpu_std = disk_std = mem_std = 0;
     let cpuSum = diskSum = memSum = 0;
 
+   // const object_to_send = JSON.parse(records.data);
     for (let i = 0; i < records.data.length; i++) {
 
       // Parse the string to json and because the data comes corrupted, we replace the ' in "
@@ -48,24 +49,27 @@ exports.sampleTelemetryInfo = async () =>
       handleStd(disk_std);
       handleStd(mem_std);
 
-      console.log('cpu: avg = '+cpuAvg+', val = '+cpu_rec+", std = "+cpu_std);
-      console.log('disk: avg = '+diskAvg+', val = '+disk_rec+", std = "+disk_std);
-      console.log('mem: avg = '+memAvg+', val = '+mem_rec+", std = "+mem_std+'\n');
+    //   console.log('cpu: avg = '+cpuAvg+', val = '+cpu_rec+", std = "+cpu_std);
+    //   console.log('disk: avg = '+diskAvg+', val = '+disk_rec+", std = "+disk_std);
+    //   console.log('mem: avg = '+memAvg+', val = '+mem_rec+", std = "+mem_std+'\n');
 
       // Add the number to the avg
       cpuSum  += cpu_rec;
       diskSum += disk_rec;
       memSum  += mem_rec;
+
+      //handle_telemetry_update(record)
+    //   update_func(record)
     }
     cpuAvg = (cpuAvg + cpuSum) / (records.data.length + 1);
     diskAvg = (diskAvg + diskSum) / (records.data.length + 1);
     memAvg = (memAvg + memSum) / (records.data.length + 1)
 
-    console.log('cpu avg  : ' + cpuAvg);
-    console.log('disk avg : ' + diskAvg);
-    console.log('mem avg  : ' + memAvg);
+    // console.log('cpu avg  : ' + cpuAvg);
+    // console.log('disk avg : ' + diskAvg);
+    // console.log('mem avg  : ' + memAvg);
 
-    handle_telemetry_update(record)
+    return records.data;
   } catch (err) {
     console.error(err);
   }

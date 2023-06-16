@@ -11,7 +11,7 @@ exports.getMalfunctionsByRoomId = async (req, res) => {
 
 exports.createMalfunction = async (req, res) => {
     try {
-        const malfunction = await Malfunction.create({ ...req.body }).exec();
+        const malfunction = await new Malfunction({ ...req.body }).save();
         res.status(200).json(malfunction);
     } catch (error) {
         console.log(error);

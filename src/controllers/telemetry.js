@@ -26,7 +26,7 @@ exports.getAllTelemetry = (req, res) => {
                 process.stdout.write(data);
                 res.status(200).json(res_data);
             } catch (error) {
-                res.status(401).write(error);
+                // res.status(401).write(error);
             }
         });
     });
@@ -34,8 +34,8 @@ exports.getAllTelemetry = (req, res) => {
     request.end();
 
     request.on('finish', () => {
-        console.log("on finish");
-        console.log(res_data);
+        // console.log("on finish");
+        // console.log(res_data);
     });
 };
 
@@ -74,7 +74,7 @@ exports.get_updates_table = (req, res) => {
     request.end();
 
     request.on('finish', () => {
-        console.log("on finish");
+        // console.log("on finish");
         console.log(res_data);
     });
 };
@@ -114,7 +114,7 @@ exports.get_last = (req, res) => {
     request.end();
 
     request.on('finish', () => {
-        console.log("on finish");
-        console.log(res_data);
+        // console.log("on finish");
+        // console.log(res_data);
     });
 };

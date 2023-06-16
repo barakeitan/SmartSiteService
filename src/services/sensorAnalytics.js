@@ -64,7 +64,6 @@ exports.start_intervals = async () => {
 
 async function main(telemetry_data) {
     try {
-        //console.log("elad : " + telemetry_data);
         global_telemetry_data = telemetry_data[0];
         //temporaryyyyyy - only for trials
         broadcast(global_telemetry_data);

@@ -82,7 +82,7 @@ exports.get_updates_table = (req, res) => {
 exports.get_last = (req, res) => {
     const options = {
         hostname: "127.0.0.1",
-        path: "/lastrs",
+        path: "/last",
         port: 8001,
         method: "GET"
     };

@@ -137,18 +137,19 @@ function checkZone(currentValue, minVal, maxVal) {
  * @param {string} status 
  * update status sensor 
  */
-function updateSensorStatus(sensor, status) {
-    Sensor.findByIdAndUpdate({ _id: sensor.id })
-        .then(sensor => {
-            if (!sensor) {
-                throw new Error("sensor doesn't exists");
-            }
-            sensor.status = status;
-            sensor.save();
-        })
-        .catch(err => {
-            console.log(err);
-        });
+async function updateSensorStatus(sensor, status) {
+    const sensor_find = await Sensor.findByIdAndUpdate({ _id: sensor.id });
+        // .then(sensor => {
+
+        // })
+        // .catch(err => {
+        //     console.log(err);
+        // });
+    if (!sensor_find) {
+        throw new Error("sensor doesn't exists");
+    }
+    sensor_find.status = status;
+    await sensor_find.save();
 }
 
 /**
@@ -157,7 +158,7 @@ function updateSensorStatus(sensor, status) {
 * @param {sensr_type object} sensor_type
 * @description Checks the data of the sensors in each room and their integrity and alerts accordingly 
 */
-function checkAlerts(room, sensor, sensor_type, dataType ) {
+async function checkAlerts(room, sensor, sensor_type, dataType ) {
     let message = '';
     //console.log("checking zone for " + sensor_type.name + " with value of " + sensor.sensorData)
     switch (
@@ -168,12 +169,12 @@ function checkAlerts(room, sensor, sensor_type, dataType ) {
     )
     ) {
         case 1:
-            updateSensorStatus(sensor, "1");
+            await updateSensorStatus(sensor, "1");
             break;
         case 2:
             message = "In warning zone";
             //console.log("mapping for " + sensor_type["name"] + " is " + mappings[sensor_type["name"]]);
-            check_if_exists_last_hour(
+            await check_if_exists_last_hour(
                 room,
                 sensor,
                 process.env.SENSOR_DATA_EXEPTION,
@@ -181,11 +182,11 @@ function checkAlerts(room, sensor, sensor_type, dataType ) {
                 "WARNING : ",
                 mappings[sensor_type["name"]]["warning"]
             );
-            updateSensorStatus(sensor, "2");
+            await updateSensorStatus(sensor, "2");
             break;
         case 3:
             message = "In Danger zone";
-            check_if_exists_last_hour(
+            await check_if_exists_last_hour(
                 room,
                 sensor,
                 process.env.SENSOR_DATA_ONGOING_EXEPTION,
@@ -193,7 +194,7 @@ function checkAlerts(room, sensor, sensor_type, dataType ) {
                 "DANGER : ",
                 mappings[sensor_type["name"]]["danger"]
             );
-            updateSensorStatus(sensor, "3");
+            await updateSensorStatus(sensor, "3");
             break;
     }
 }
@@ -211,33 +212,34 @@ function checkAlerts(room, sensor, sensor_type, dataType ) {
  *              If not entered, then it enters a new malfunction
  *              and sends a Telegram message to the customer about the malfunction
  */
-function check_if_exists_last_hour(room, sensor, malfunctionTypeId, message, severity, analyticsCallback) {
+async function check_if_exists_last_hour(room, sensor, malfunctionTypeId, message, severity, analyticsCallback) {
     const currentDate = new Date();
     currentDate.setTime(
         currentDate.getTime() - new Date().getTimezoneOffset() * 60 * 1000
     );
     const beforeAnHour = new Date(currentDate);
     beforeAnHour.setHours(beforeAnHour.getHours() - 1);
-    Malfunction.find({
+    let malfunctions = await Malfunction.find({
         sensorId: sensor._id,
         malfunctionTypeId: malfunctionTypeId,
         date: {
             $gte: beforeAnHour, //from
             $lt: currentDate //to
         }
-    })
-        .then(malfunctions => {
-            if (!malfunctions[0]) {
-                //if there is no malfunction within the last hour in sensor and
-                //his mal_type then insert a new one
-                insertMalfunction(room, sensor, malfunctionTypeId, message, severity);
-                sendMessage(room, sensor, malfunctionTypeId);
-                analyticsCallback();
-            }
-        })
-        .catch(err => {
-            console.log(err);
-        });
+    });
+    if (!malfunctions[0]) {
+        //if there is no malfunction within the last hour in sensor and
+        //his mal_type then insert a new one
+        //insertMalfunction(room, sensor, malfunctionTypeId, message, severity);
+        await sendMessage(room, sensor, malfunctionTypeId);
+        analyticsCallback();
+    }
+        // .then(malfunctions => {
+            
+        // })
+        // .catch(err => {
+        //     console.log(err);
+        // });
 }
 /**
  * 
@@ -247,29 +249,29 @@ function check_if_exists_last_hour(room, sensor, malfunctionTypeId, message, sev
  * @param {*} message 
  * insert new malfunction to the system
  */
-function insertMalfunction(room, sensor, malfunctionTypeId, message, severity) {
+async function insertMalfunction(room, sensor, malfunctionTypeId, message, severity) {
     let currentDate = new Date();
     currentDate.setTime(
         currentDate.getTime() - new Date().getTimezoneOffset() * 60 * 1000
     );
-    Record.findOne({ sensorId: sensor._id })
-        .sort({ date: -1 })
-        .limit(1)
-        .then(record => {
-            let malfunction = new Malfunction({
-                roomId: room._id,
-                sensorId: sensor._id,
-                date: currentDate,
-                malfunctionTypeId: malfunctionTypeId,
-                recent_data: sensor.sensorData,
-                severity: severity,
-                message: message,
-            });
-            malfunction.save();
-        })
-        .catch(err => {
-            console.log(err);
-        });
+    // await Record.findOne({ sensorId: sensor._id })
+    //     .sort({ date: -1 })
+    //     .limit(1)
+        // .then(record => {
+            
+        // })
+        // .catch(err => {
+        //     console.log(err);
+        // });
+        await new Malfunction({
+            roomId: room._id,
+            sensorId: sensor._id,
+            date: currentDate,
+            malfunctionTypeId: malfunctionTypeId,
+            recent_data: sensor.sensorData,
+            severity: severity,
+            message: message,
+        }).save();
 }
 /**
  * Updating the status of the site / room according to priority of criticality, 
@@ -325,25 +327,25 @@ const handle_telemetry_update = (telemetry_update) => {
     }
 }
 
-function check_cpu_warning() {
+async function check_cpu_warning() {
     // check memory - if up send warning heavy process if not bad process
     let zone = checkZone(global_telemetry_data["memory"], 0, 100);
     let heavy_malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU warning heavy process")
     let bad_malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU warning bad process")
     if(zone > 1)
     {
-        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Cpu Sensor"),
+        await insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Cpu Sensor"),
         heavy_malf._id, "WARNING : ", "");
     }
     else
     {
         default_sensors.forEach(sensor => {console.log("sensor " + sensor["sensorTypeId"]["name"]);})
-        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Cpu Sensor"),
+        await insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Cpu Sensor"),
         bad_malf._id, "WARNING : ", "");
     }
 }
 
-function check_cpu_danger() {
+async function check_cpu_danger() {
     //check mem - if up display busy task if not malf program error
     let mem_zone = checkZone(global_telemetry_data["memory"], 0, 100);
     //check temp - if up then alert to close the task if not so it is less dangerous
@@ -356,18 +358,18 @@ function check_cpu_danger() {
     if(sound_zone > 1)
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger fans");
-        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Cpu Sensor"),
+        await insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Cpu Sensor"),
         malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data["process"]);
     }
     else
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger hot");
-        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Cpu Sensor"),
+        await insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Cpu Sensor"),
         malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data["process"]);
     }
 }
 
-function check_temperature_warning() {
+async function check_temperature_warning() {
     //check sound, if up then maybe fans work too much, if down then problem AC, if not changed then other problem
     //alert the result as warning
     let sound_sensor = default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Sound Sensor");
@@ -376,18 +378,18 @@ function check_temperature_warning() {
     if(sound_zone > 1)
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperture warning");
-        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Temperature Sensor"),
+        await insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Temperature Sensor"),
         malf._id, "WARNING : ", "or the fans started working too hard");
     }
     else
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperture warning");
-        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Temperature Sensor"),
+        await insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Temperature Sensor"),
         malf._id, "WARNING : ", "");
     }
 }
 
-function check_temperature_danger() {
+async function check_temperature_danger() {
     // same as the warning just in result
     let sound_sensor = default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Sound Sensor");
     let sound_zone = checkZone(sound_sensor.sensorData, sound_sensor.sensorType["minValue"], sound_sensor.sensorType["maxValue"]);
@@ -398,25 +400,25 @@ function check_temperature_danger() {
     if(sound_zone > 1 || cpu_zone > 1)
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperature fans danger");
-        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Temperature Sensor"),
+        await insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Temperature Sensor"),
         malf._id, "DANGER : ", "");
     }
     else
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperture danger");
-        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Temperature Sensor"),
+        await insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Temperature Sensor"),
         malf._id, "DANGER : ", "");
     }
 }
 
-function check_sound_warning() {
+async function check_sound_warning() {
     // alert that one of the computers are working hard
     let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Sound warning");
-    insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Sound Sensor"),
+    await insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Sound Sensor"),
     malf._id, "WARNING : ", "");
 }
 
-function check_sound_danger() {
+async function check_sound_danger() {
     //alert that many computers are working hard
     let cpu_sensor = default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Cpu Sensor");
     let cpu_zone = checkZone(cpu_sensor.sensorData, cpu_sensor.sensorType["minValue"], cpu_sensor.sensorType["maxValue"]);
@@ -428,13 +430,13 @@ function check_sound_danger() {
     if(cpu_zone > 1)
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Sound danger");
-        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Sound Sensor"),
+        await insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Sound Sensor"),
         malf._id, "DANGER : ", "");
     }
     else
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Sound warning");
-        insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Sound Sensor"),
+        await insertMalfunction(default_room_id, default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Sound Sensor"),
         malf._id, "DANGER : ", "");// TODO: add severity to the malfunctions
     }
 }

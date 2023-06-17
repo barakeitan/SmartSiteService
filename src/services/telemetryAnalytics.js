@@ -96,24 +96,28 @@ exports.handlePostUpdate = async (payload) => {
     //if the entity exist 
     if(entity[0]){
       console.log("found entity " + payload["telemetryEntity"]);
-      const sensors = await Sensor.find({ telemetryEntityId: entity._id }).populate("sensorTypeId").exec();
+      const sensors = await Sensor.find({ telemetryEntityId: entity[0]._id }).populate("sensorTypeId").exec();
       // console.log("sensors : "+sensors);
       sensors.forEach(async sensor => {
-          switch(sensor.sensorTypeId){
-            case CPU_SENSOR_TYPE:
-              sensor.sensorData = payload["cpu"];
-              await sensor.save();
-              break;
-            case DISK_SENSOR_TYPE:
-              sensor.sensorData = payload["disk"];
-              await sensor.save();
-              break;
-            case MEM_SENSOR_TYPE:
-              sensor.sensorData = payload["memory"];
-              await sensor.save();
-              break; 
+        console.log(sensor.sensorTypeId["id"])
+        switch(sensor.sensorTypeId["id"]){
+          case CPU_SENSOR_TYPE:
+            sensor.sensorData = payload["cpu"];
+            sensor.date = Date.now();
+            await sensor.save();
+          break;
+          case DISK_SENSOR_TYPE:
+            sensor.sensorData = payload["disk"];
+            sensor.date = Date.now();
+            await sensor.save();
+          break;
+          case MEM_SENSOR_TYPE:
+            sensor.sensorData = payload["memory"];
+            sensor.date = Date.now();
+            await sensor.save();
+          break; 
+        }
 
-          }
       });
     }
     else{ //this is a new entity

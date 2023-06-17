@@ -81,9 +81,9 @@ exports.start_intervals = async () => {
     // setInterval(main, 3000);
     setInterval(async()=>{
         // TODO: save the telemetry data to the db
-        const telemetryData = await sampleTelemetryInfo();
+        // const telemetryData = await sampleTelemetryInfo();
         // Download said telemetry data back from the db
-        await main(telemetryData);
+        //await main(telemetryData);
         await updateStatusInGeneral()
     },3000)
 }
@@ -320,6 +320,19 @@ const updateStatusInGeneral = async () => {
 
     } catch (error) {
         console.log(error);
+    }
+}
+
+exports.createSensor = async (roomId, siteId, telemetry_entity, sensor_type, value, sensorStatus) => {
+    try {
+        await new Sensor({  sensorTypeId: sensor_type,
+                            telemetryEntityId: telemetry_entity, 
+                            date: Date.now(), 
+                            sensorData: value,
+                            roomId: roomId,
+                            status: sensorStatus}).save();
+    } catch (error) {
+        console.log(error)
     }
 }
 

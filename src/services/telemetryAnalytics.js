@@ -69,7 +69,7 @@ exports.sampleTelemetryInfo = async () =>
     // console.log('disk avg : ' + diskAvg);
     // console.log('mem avg  : ' + memAvg);
 
-    return records.data;
+    return response;
   } catch (err) {
     console.error(err);
   }

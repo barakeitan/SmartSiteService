@@ -94,7 +94,7 @@ exports.handlePostUpdate = async (payload) => {
     const entity = await TelemetryEntity.find({telemetryEntityName : payload["telemetryEntitiy"]}).exec();
     
     //if the entity exist 
-    if(typeof entity !== 'undefined'){
+    if(entity[0]){
       console.log("found entity " + payload["telemetryEntity"]);
       const sensors = await Sensor.find({ telemetryEntityId: entity._id }).populate("sensorTypeId").exec();
       // console.log("sensors : "+sensors);

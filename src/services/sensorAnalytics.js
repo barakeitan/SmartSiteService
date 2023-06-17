@@ -90,7 +90,7 @@ exports.start_intervals = async () => {
 
 async function main(telemetry_data) {
     try {
-        global_telemetry_data = telemetry_data[0];
+        global_telemetry_data = telemetry_data;
         //temporaryyyyyy - only for trials
         broadcast(global_telemetry_data);
         const rooms = await Room.find({}).exec();
@@ -357,13 +357,13 @@ async function check_cpu_danger() {
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger fans");
         await check_if_exists_last_hour(default_room_id, cpu_sensor,
-        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data["process"]);
+        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data.data.proces);
     }
     else
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger hot");
         await check_if_exists_last_hour(default_room_id, cpu_sensor,
-        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data["process"]);
+        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data.data.process);
     }
 }
 

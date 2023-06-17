@@ -1,4 +1,5 @@
 const http = require("http");
+const {handlePostUpdate} = require("../services/telemetryAnalytics");
 
 exports.getAllTelemetry = (req, res) => {
     const options = {
@@ -118,3 +119,11 @@ exports.get_last = (req, res) => {
         // console.log(res_data);
     });
 };
+
+exports.telemetryDataPost = (req, res) => 
+{
+    console.log("handling data from the post")
+    const payload = req.body;
+    handlePostUpdate(payload);
+    res.status(200).json({ message: 'POST request received' });
+}

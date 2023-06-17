@@ -124,6 +124,7 @@ exports.telemetryDataPost = (req, res) =>
 {
     console.log("handling data from the post")
     const payload = req.body;
+    //also send in web socket if working and save each update here or in the telemetryAnalytics
     handlePostUpdate(payload);
     res.status(200).json({ message: 'POST request received' });
 }

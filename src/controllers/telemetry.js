@@ -12,7 +12,7 @@ exports.getAllTelemetry = (req, res) => {
     const request = http.request(options, api_res =>{
         let data = '';
         api_res.on("data", d => {
-            console.log(d);
+            // console.log(d);
             data = d;
         });
 
@@ -52,7 +52,7 @@ exports.get_updates_table = (req, res) => {
     const request = http.request(options, api_res =>{
         let data = '';
         api_res.on("data", d => {
-            console.log(d);
+            // console.log(d);
             data = d;
         });
 
@@ -63,7 +63,7 @@ exports.get_updates_table = (req, res) => {
         api_res.on("end", () =>{
             try {
                 res_data = JSON.parse(data);
-                process.stdout.write(data);
+                // process.stdout.write(data);
                 res.status(200).json(res_data);
             } catch (error) {
                 res.status(401).write(error);
@@ -75,7 +75,7 @@ exports.get_updates_table = (req, res) => {
 
     request.on('finish', () => {
         // console.log("on finish");
-        console.log(res_data);
+        // console.log(res_data);
     });
 };
 
@@ -92,8 +92,8 @@ exports.get_last = (req, res) => {
     const request = http.request(options, api_res =>{
         let data = '';
         api_res.on("data", d => {
-            console.log(d);
-            data = d;
+            // console.log(d);
+            // data = d;
         });
 
         api_res.on("error", error =>{

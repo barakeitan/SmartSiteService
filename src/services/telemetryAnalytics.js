@@ -74,3 +74,8 @@ exports.sampleTelemetryInfo = async () =>
     console.error(err);
   }
 };
+
+exports.handlePostUpdate = (payload) => {
+  // TODO : implement
+  
+}

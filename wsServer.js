@@ -18,7 +18,6 @@ wsServer.on('request', (request) => {
 
     connection.on('message', (message) =>     {
         console.log(`server accepted new message: ${message.utf8Data}`);
-        alert(`server accepted new message: ${message.utf8Data}`)
     });
     
     connection.on('close', () => {

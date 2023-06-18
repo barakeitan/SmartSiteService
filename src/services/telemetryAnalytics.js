@@ -3,6 +3,7 @@ const { createSensor } = require('./sensorAnalytics');
 const TelemetryEntity = require("../models/telemetryEntity.model")
 const SensorTypes = require("../models/sensorType.model")
 const Sensor = require("../models/sensor.model")
+const Record = require("../models/record.model")
 
 // Telemetry variables
 let cpuAvg = 0;
@@ -95,7 +96,7 @@ exports.handlePostUpdate = async (payload) => {
     
     //if the entity exist 
     if(entity[0]){
-      console.log("found entity " + payload["telemetryEntity"]);
+      console.log("found entity " + payload["telemetryEntitiy"]);
       const sensors = await Sensor.find({ telemetryEntityId: entity[0]._id }).populate("sensorTypeId").exec();
       // console.log("sensors : "+sensors);
       sensors.forEach(async sensor => {
@@ -105,19 +106,33 @@ exports.handlePostUpdate = async (payload) => {
             sensor.sensorData = payload["cpu"];
             sensor.date = Date.now();
             await sensor.save();
+            await new Record({sensorId:sensor._id, 
+                              telemetryEntityId:entity[0]._id,
+                              date:Date.now(),
+                              sensorData:payload["cpu"],
+                              roomId:sensor.roomId}).save();
           break;
           case DISK_SENSOR_TYPE:
             sensor.sensorData = payload["disk"];
             sensor.date = Date.now();
             await sensor.save();
+            await new Record({sensorId:sensor._id, 
+              telemetryEntityId:entity[0]._id,
+              date:Date.now(),
+              sensorData:payload["disk"],
+              roomId:sensor.roomId}).save();
           break;
           case MEM_SENSOR_TYPE:
             sensor.sensorData = payload["memory"];
             sensor.date = Date.now();
             await sensor.save();
+            await new Record({sensorId:sensor._id, 
+              telemetryEntityId:entity[0]._id,
+              date:Date.now(),
+              sensorData:payload["memory"],
+              roomId:sensor.roomId}).save();
           break; 
         }
-
       });
     }
     else{ //this is a new entity

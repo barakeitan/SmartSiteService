@@ -10,7 +10,10 @@ exports.getMalfunctionsByRoomId = async (req, res) => {
             path: 'sensorTypeId',
             model: 'SensorType',
             },
-        }).exec();
+        })
+        .limit(100)
+        .sort([['date', -1]])
+        .exec();
         res.status(200).json(malfunctions);
     } catch (error) {
         console.log(error);

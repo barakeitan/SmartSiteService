@@ -160,7 +160,18 @@ exports.getSensorsBycomputerId = async (req, res) => {
 exports.getRecordsBycomputerId = async (req, res) => {
     try {
         console.log("telemetryEntity in getRecordsBycomputerId: " + req.params.telemetryEntityId);
-        const records = await Record.find({ telemetryEntityId: req.params.telemetryEntityId }).exec();
+        const records = await Record.find({ telemetryEntityId: req.params.telemetryEntityId })
+        .populate({
+            path: 'sensorId',
+            select: 'sensorTypeId',
+            populate: {
+            path: 'sensorTypeId',
+            model: 'SensorType',
+            },
+        })
+        .limit(100)
+        .sort([['date', -1]])
+        .exec();
         console.log("records: ", records);
         res.status(200).json(records);
     } catch (error) {

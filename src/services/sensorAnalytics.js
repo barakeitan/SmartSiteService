@@ -84,19 +84,19 @@ exports.start_intervals = async () => {
            // TODO: save the telemetry data to the db
         //    const telemetryData = await sampleTelemetryInfo();
            // Download said telemetry data back from the db
-        //    await main(telemetryData);
+           await main();
            await updateStatusInGeneral()
-       }, 3000);
+       }, 5000);
     } catch (err) {
         console.log(err);
     }
 }
 
-async function main(telemetry_data) {
+async function main(telemetry_data=null) {
     try {
         global_telemetry_data = telemetry_data;
         //temporaryyyyyy - only for trials
-        broadcast(global_telemetry_data);
+        // broadcast(global_telemetry_data);
         const rooms = await Room.find({}).exec();
         rooms.forEach(async room => {
             const sensors = await Sensor.find({ roomId: room._id }).populate("sensorTypeId").exec();
@@ -246,7 +246,7 @@ async function check_if_exists_last_hour(room, sensor, malfunctionTypeId, severi
         //if there is no malfunction within the last hour in sensor and
         //his mal_type then insert a new one
         await insertMalfunction(room, sensor, malfunctionTypeId, message, severity);
-        await sendMessage(room, sensor, malfunctionTypeId);
+        // await sendMessage(room, sensor, malfunctionTypeId);
         // analyticsCallback();
     }
         // .then(malfunctions => {
@@ -279,7 +279,8 @@ async function insertMalfunction(room, sensor, malfunctionTypeId, message, sever
         //     console.log(err);
         // });
         await new Malfunction({
-            roomId: room._id,
+            // roomId: room._id,
+            roomId: default_room_id,
             sensorId: sensor._id,
             date: currentDate,
             malfunctionTypeId: malfunctionTypeId,
@@ -374,7 +375,7 @@ async function check_cpu_danger() {
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger fans");
         await check_if_exists_last_hour(default_room_id, cpu_sensor,
-        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data.data.proces);
+        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data?.data?.proces);
     }
     else
     {

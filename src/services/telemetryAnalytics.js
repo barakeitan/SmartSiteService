@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { handle_telemetry_update , createSensor} = require('./sensorAnalytics');
+const { createSensor } = require('./sensorAnalytics');
 const TelemetryEntity = require("../models/telemetryEntity.model")
 const SensorTypes = require("../models/sensorType.model")
 const Sensor = require("../models/sensor.model")

@@ -75,17 +75,21 @@ const mappings = {
 }
 
 exports.start_intervals = async () => {
-     malfunctionsTypes = await MalfunctionType.find({}).exec();
-    // setInterval(sampleTelemetryInfo, 3000)
-    // setInterval(updateStatusInGeneral, 3000);
-    // setInterval(main, 3000);
-    setInterval(async()=>{
-        // TODO: save the telemetry data to the db
-        // const telemetryData = await sampleTelemetryInfo();
-        // Download said telemetry data back from the db
-        //await main(telemetryData);
-        await updateStatusInGeneral()
-    },3000)
+    try {
+        malfunctionsTypes = await MalfunctionType.find({}).exec();
+       // setInterval(sampleTelemetryInfo, 3000)
+       // setInterval(updateStatusInGeneral, 3000);
+       // setInterval(main, 3000);
+       setInterval(async()=>{
+           // TODO: save the telemetry data to the db
+        //    const telemetryData = await sampleTelemetryInfo();
+           // Download said telemetry data back from the db
+        //    await main(telemetryData);
+           await updateStatusInGeneral()
+       }, 3000);
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 async function main(telemetry_data) {
@@ -376,7 +380,7 @@ async function check_cpu_danger() {
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger hot");
         await check_if_exists_last_hour(default_room_id, cpu_sensor,
-        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data.data.process);
+        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data?.data?.process);
     }
 }
 

@@ -4,8 +4,8 @@ var server = require('http').createServer().listen(wsServerPort);
 var wsServer = new webSocketServer({httpServer: server});
 console.log(`wss is listening on port ${wsServerPort}`);
 
-const connectionsMap = new Map();
-const idMap = new Map();
+const connectionsMap = new Map(); //<connectionId, connection>
+const idMap = new Map(); // <connection, connectionId>
 
 wsServer.on('request', (request) => {
     var connectionId = getUniqueID();
@@ -13,6 +13,8 @@ wsServer.on('request', (request) => {
     connectionsMap.set(connectionId, connection);
     idMap.set(connection, connectionId);
     console.log(`user ${connectionId} connected`);
+    //eco msg for tests
+    connection.send(JSON.stringify({msg: "asdvasdv"}));
 
     connection.on('message', (message) =>     {
         console.log(`server accepted new message: ${message.utf8Data}`);
@@ -29,7 +31,7 @@ wsServer.on('request', (request) => {
 
 function broadcast(msg) {
     for (const webSocket of connectionsMap.values()) {
-      webSocket.sendUTF(msg);
+      webSocket.send(JSON.stringify((msg)));
     }
  };
 

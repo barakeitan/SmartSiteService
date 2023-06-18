@@ -5,5 +5,5 @@ const telemetryEntitySchema = new Schema({
     telemetryEntityName: { type: String }
 });
 
-const telemetryEntity = mongoose.model("TelemetryEntity", telemetryEntitySchema, "TelemetryEntity");
-module.exports = telemetryEntity;
+const TelemetryEntity = mongoose.model("TelemetryEntity", telemetryEntitySchema, "TelemetryEntity");
+module.exports = TelemetryEntity;

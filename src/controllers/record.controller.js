@@ -3,7 +3,7 @@ const Sensor = require('../models/sensor.model');
 
 exports.getRecordBySensorId = async (req, res) => {
     try {
-        const records = await Record.find({ _id: req.params.sensorId }).exec();
+        const records = await Record.find({ sensorId: req.params.sensorId }).exec();
         res.status(200).json(records);
     } catch (error) {
         console.log(error);

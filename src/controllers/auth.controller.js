@@ -45,6 +45,7 @@ exports.isAuthenticate = (req, res) => {
     // Verify access token
     jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
       if (err) {
+        console.log('Unauthorized: Invalid token');
         return res.status(401).json({ message: 'Unauthorized: Invalid token' });
       }
         if (decoded.exp && (Math.floor(Date.now() / 1000) - decoded.exp) > process.env.ACCESS_TOKEN_EXPIRED_IN) {

@@ -1,5 +1,8 @@
 const http = require("http");
 const {handlePostUpdate} = require("../services/telemetryAnalytics");
+const Record = require('../models/record.model');
+const Sensor = require('../models/sensor.model');
+const TelemetryEntity = require('../models/telemetryEntity.model');
 
 exports.getAllTelemetry = (req, res) => {
     const options = {
@@ -127,4 +130,40 @@ exports.telemetryDataPost = (req, res) =>
     //also send in web socket if working and save each update here or in the telemetryAnalytics
     handlePostUpdate(payload);
     res.status(200).json({ message: 'POST request received' });
+}
+
+exports.getComputersByroomId = async (req, res) => {
+    try {
+        console.log("roomId: " + req.params.roomId);
+        const telemetryEntity = await TelemetryEntity.find({ roomId: req.params.roomId }).exec();
+        console.log("telemetryEntity in getComputersByroomId: " + telemetryEntity);
+        res.status(200).json(telemetryEntity);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+exports.getSensorsBycomputerId = async (req, res) => {
+    try {
+        console.log("telemetryEntity in getSensorsBycomputerId: " + req.params.telemetryEntityId);
+        const sensors = await Sensor.find({ telemetryEntityId: req.params.telemetryEntityId })
+        .populate("sensorTypeId")
+        .exec();
+        console.log("sensors: ", sensors);
+        res.status(200).json(sensors);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+exports.getRecordsBycomputerId = async (req, res) => {
+    try {
+        console.log("telemetryEntity in getRecordsBycomputerId: " + req.params.telemetryEntityId);
+        const records = await Record.find({ telemetryEntityId: req.params.telemetryEntityId }).exec();
+        console.log("records: ", records);
+        res.status(200).json(records);
+    } catch (error) {
+        console.log(error);
+    }
 }

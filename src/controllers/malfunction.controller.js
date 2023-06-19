@@ -16,7 +16,6 @@ exports.getMalfunctionsByRoomId = async (req, res) => {
         .sort([['date', -1]])
         .limit(100)
         .exec();
-        console.log("malfunctions:"+malfunctions)
         res.status(200).json(malfunctions);
     } catch (error) {
         console.log(error);

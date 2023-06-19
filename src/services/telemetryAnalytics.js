@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { createSensor } = require('./sensorAnalytics');
+const { createSensor, updateEntityProcess } = require('./sensorAnalytics');
 const TelemetryEntity = require("../models/telemetryEntity.model")
 const SensorTypes = require("../models/sensorType.model")
 const Sensor = require("../models/sensor.model")
@@ -9,6 +9,8 @@ const Record = require("../models/record.model")
 let cpuAvg = 0;
 let diskAvg = 0;
 let memAvg = 0;
+
+
 
 const CPU_SENSOR_TYPE = "6480b46ca40f681bc7585e80";
 const DISK_SENSOR_TYPE = "648449a15d13c587f96910ac";
@@ -93,6 +95,8 @@ exports.handlePostUpdate = async (payload) => {
       console.log("found entity " + payload["telemetryEntitiy"]);
       const sensors = await Sensor.find({ telemetryEntityId: entity[0]._id }).populate("sensorTypeId").exec();
       
+      updateEntityProcess(entity[0]._id, payload['process']);
+
       sensors.forEach(async sensor => {
         console.log(sensor.sensorTypeId["id"])
         switch(sensor.sensorTypeId["id"]){
@@ -137,6 +141,8 @@ exports.handlePostUpdate = async (payload) => {
         roomId: payload["roomId"],
         telemetryEntityName: payload["telemetryEntitiy"], 
       }).save();
+
+      updateEntityProcess(newEntity._id, payload['process']);
 
       //create cpu sensor
       createSensor(payload["roomId"], payload["siteId"], newEntity._id, CPU_SENSOR_TYPE, payload["cpu"], "1");

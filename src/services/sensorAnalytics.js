@@ -297,38 +297,40 @@ async function insertMalfunction(room, sensor, malfunctionTypeId, message, sever
  */
 const updateStatusInGeneral = async () => {
     try {
-        const sites = await Site.find({}).exec();
-        sites.forEach(async site => {
-            const rooms = await Room.find({ siteId: site._id }).exec();
-            let site_maxStatus = "0";
-            rooms.forEach(async room => {
-                const sensors = await Sensor.find({ roomId: room._id }).exec();
-                let sensors_maxStatus = "0";
-                sensors.forEach(async sensor => {
-                    if (sensor.status > sensors_maxStatus) {
-                        sensors_maxStatus = sensor.status;
-                    }
-                });
+      const sites = await Site.find({}).exec();
 
-                if (sensors_maxStatus !== "0") {
-                    room.status = sensors_maxStatus;
-                    if (room.status > site_maxStatus) {
-                        site_maxStatus = room.status;
-                    }
-                    await room.save();
-                }
+      for (const site of sites) {
+        let site_maxStatus = "0";
+        const rooms = await Room.find({ siteId: site._id }).exec();
 
-            });
-            if (site_maxStatus !== "0") {
-                site.status = site_maxStatus;
-                await site.save();
+        for (const room of rooms) {
+          const sensors = await Sensor.find({ roomId: room._id }).exec();
+          let sensors_maxStatus = "0";
+
+          for (const sensor of sensors) {
+            if (sensor.status > sensors_maxStatus) {
+              sensors_maxStatus = sensor.status;
             }
-        })
+          }
 
+          if (sensors_maxStatus !== "0") {
+            room.status = sensors_maxStatus;
+            if (room.status > site_maxStatus) {
+              site_maxStatus = room.status;
+            }
+            await room.save();
+          }
+        }
+
+        if (site_maxStatus !== "0") {
+          site.status = site_maxStatus;
+          await site.save();
+        }
+      }
     } catch (error) {
-        console.log(error);
+      console.error(error);
     }
-}
+  };
 
 exports.createSensor = async (roomId, siteId, telemetry_entity, sensor_type, value, sensorStatus) => {
     try {
@@ -383,17 +385,17 @@ async function check_cpu_danger(sensor) {
 
     if(sound_zone > 1)
     {
-        console.log("sensor " + sensor.telemetryEntityId + " " + processMap.get(sensor?.telemetryEntityId??""));
+        console.log("sensor " + sensor['telemetryEntityId']  + " " + processMap.get(sensor['telemetryEntityId']??""));
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger fans");
         await check_if_exists_last_hour(default_room_id, sensor,
-        malf._id, "DANGER ", "consider turning off process "+ processMap.get(sensor?.telemetryEntityId??""));//global_telemetry_data?.data?.proces);
+        malf._id, "DANGER ", "consider turning off process "+ processMap.get(sensor['telemetryEntityId']??""));//global_telemetry_data?.data?.proces);
     }
     else
     {
-        console.log("sensor " + sensor.telemetryEntityId + " " + processMap.get(sensor?.telemetryEntityId??""));
+        console.log("sensor " + sensor['telemetryEntityId'] + " " + processMap.get(sensor['telemetryEntityId']??""));
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger hot");
         await check_if_exists_last_hour(default_room_id, sensor,
-        malf._id, "DANGER ", "consider turning off process "+ processMap.get(sensor?.telemetryEntityId??""));
+        malf._id, "DANGER ", "consider turning off process "+ processMap.get(sensor['telemetryEntityId']??""));
     } 
 }
 

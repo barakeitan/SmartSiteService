@@ -84,12 +84,6 @@ exports.sampleTelemetryInfo = async () =>
 };
 
 exports.handlePostUpdate = async (payload) => {
-  // TODO : implement
-  console.log(payload)
-
-  //check if i have the telemetryEntity
-  //if not then create a new entity and 3 sensors with said entity
-  //if telemetryEntity exist then find all sensors with the related telemetry entity and call updateSensorStatus
 
   try {
     const entity = await TelemetryEntity.find({telemetryEntityName : payload["telemetryEntitiy"]}).exec();
@@ -98,7 +92,7 @@ exports.handlePostUpdate = async (payload) => {
     if(entity[0]){
       console.log("found entity " + payload["telemetryEntitiy"]);
       const sensors = await Sensor.find({ telemetryEntityId: entity[0]._id }).populate("sensorTypeId").exec();
-      // console.log("sensors : "+sensors);
+      
       sensors.forEach(async sensor => {
         console.log(sensor.sensorTypeId["id"])
         switch(sensor.sensorTypeId["id"]){

@@ -351,11 +351,11 @@ async function check_cpu_warning() {
     const cpu_sensor = default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Cpu Sensor");
     if(zone > 1)
     {
-        await check_if_exists_last_hour(default_room_id, cpu_sensor, heavy_malf._id, "WARNING : ", "");
+        await check_if_exists_last_hour(default_room_id, cpu_sensor, heavy_malf._id, "WARNING ", "");
     }
     else
     {
-        await check_if_exists_last_hour(default_room_id, cpu_sensor, bad_malf._id, "WARNING : ", "");
+        await check_if_exists_last_hour(default_room_id, cpu_sensor, bad_malf._id, "WARNING ", "");
     }
 }
 
@@ -375,13 +375,13 @@ async function check_cpu_danger() {
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger fans");
         await check_if_exists_last_hour(default_room_id, cpu_sensor,
-        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data?.data?.proces);
+        malf._id, "DANGER ", "consider turning off process "+global_telemetry_data?.data?.proces);
     }
     else
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger hot");
         await check_if_exists_last_hour(default_room_id, cpu_sensor,
-        malf._id, "DANGER : ", "consider turning off process "+global_telemetry_data?.data?.process);
+        malf._id, "DANGER ", "consider turning off process "+global_telemetry_data?.data?.process);
     }
 }
 
@@ -395,12 +395,12 @@ async function check_temperature_warning() {
     if(sound_zone > 1)
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperture warning");
-        await check_if_exists_last_hour(default_room_id, temp_sensor, malf._id, "WARNING : ", "or the fans started working too hard");
+        await check_if_exists_last_hour(default_room_id, temp_sensor, malf._id, "WARNING ", "or the fans started working too hard");
     }
     else
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperture warning");
-        await check_if_exists_last_hour(default_room_id, temp_sensor, malf._id, "WARNING : ", "");
+        await check_if_exists_last_hour(default_room_id, temp_sensor, malf._id, "WARNING ", "");
     }
 }
 
@@ -417,12 +417,12 @@ async function check_temperature_danger() {
     if(sound_zone > 1 || cpu_zone > 1)
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperature fans danger");
-        await check_if_exists_last_hour(default_room_id, temperature_sensor, malf._id, "DANGER : ", "");
+        await check_if_exists_last_hour(default_room_id, temperature_sensor, malf._id, "DANGER ", "");
     }
     else
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Temperture danger");
-        await check_if_exists_last_hour(default_room_id, temperature_sensor, malf._id, "DANGER : ", "");
+        await check_if_exists_last_hour(default_room_id, temperature_sensor, malf._id, "DANGER ", "");
     }
 }
 
@@ -430,7 +430,7 @@ async function check_sound_warning() {
     // alert that one of the computers are working hard
     let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Sound warning");
     const sound_sensor = default_sensors.find((obj)=> obj["sensorTypeId"]["name"] == "Sound Sensor");
-    await check_if_exists_last_hour(default_room_id, sound_sensor, malf._id, "WARNING : ", "");
+    await check_if_exists_last_hour(default_room_id, sound_sensor, malf._id, "WARNING ", "");
 }
 
 async function check_sound_danger() {
@@ -446,12 +446,12 @@ async function check_sound_danger() {
     if(cpu_zone > 1)
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Sound danger");
-        await check_if_exists_last_hour(default_room_id, sound_sensor, malf._id, "DANGER : ", "");
+        await check_if_exists_last_hour(default_room_id, sound_sensor, malf._id, "DANGER ", "");
     }
     else
     {
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "Sound warning");
-        await check_if_exists_last_hour(default_room_id, sound_sensor, malf._id, "DANGER : ", "");
+        await check_if_exists_last_hour(default_room_id, sound_sensor, malf._id, "DANGER ", "");
     }
 }
 

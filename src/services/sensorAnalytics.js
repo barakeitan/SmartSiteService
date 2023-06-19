@@ -227,7 +227,7 @@ async function checkAlerts(room, sensor, sensor_type) {
  *              and sends a Telegram message to the customer about the malfunction
  */
 async function check_if_exists_last_hour(room, sensor, malfunctionTypeId, severity, message) {
-    console.log("in the last hour")
+    console.log("in the last hour with sensor " + sensor._id)
     const currentDate = new Date();
     currentDate.setTime(
         currentDate.getTime() - new Date().getTimezoneOffset() * 60 * 1000
@@ -249,6 +249,7 @@ async function check_if_exists_last_hour(room, sensor, malfunctionTypeId, severi
         // await sendMessage(room, sensor, malfunctionTypeId);
         // analyticsCallback();
     }
+    //console.log(malfunctions)
         // .then(malfunctions => {
             
         // })
@@ -344,7 +345,9 @@ exports.createSensor = async (roomId, siteId, telemetry_entity, sensor_type, val
 
 exports.updateEntityProcess = (entity_id, process) => {
     console.log("Add " + process + " to entity " + entity_id);
-    return processMap.set(entity_id, process);
+    processMap.set(entity_id, process);
+    console.log(processMap.get(entity_id));
+    return processMap.get(entity_id);
 }
 
 async function check_cpu_warning(sensor) {
@@ -380,14 +383,16 @@ async function check_cpu_danger(sensor) {
 
     if(sound_zone > 1)
     {
+        console.log("sensor " + sensor.telemetryEntityId + " " + processMap.get(sensor?.telemetryEntityId??""));
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger fans");
-        await check_if_exists_last_hour(default_room_id, cpu_sensor,
+        await check_if_exists_last_hour(default_room_id, sensor,
         malf._id, "DANGER ", "consider turning off process "+ processMap.get(sensor?.telemetryEntityId??""));//global_telemetry_data?.data?.proces);
     }
     else
     {
+        console.log("sensor " + sensor.telemetryEntityId + " " + processMap.get(sensor?.telemetryEntityId??""));
         let malf = malfunctionsTypes.find((obj) => obj.malfunctionTypeName == "CPU danger hot");
-        await check_if_exists_last_hour(default_room_id, cpu_sensor,
+        await check_if_exists_last_hour(default_room_id, sensor,
         malf._id, "DANGER ", "consider turning off process "+ processMap.get(sensor?.telemetryEntityId??""));
     } 
 }

@@ -7,6 +7,7 @@ exports.getRecordBySensorId = async (req, res) => {
         res.status(200).json(records);
     } catch (error) {
         console.log(error);
+        res.status(500).json("failed");
     }
 }
 
@@ -17,5 +18,6 @@ exports.createRecord = async (req, res) => {
         res.status(200).json({ record, updatedSensor });
     } catch (error) {
         console.log(error);
+        res.status(500).json("failed");
     }
 }

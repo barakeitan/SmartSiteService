@@ -2,6 +2,7 @@ const http = require("http");
 const {handlePostUpdate} = require("../services/telemetryAnalytics");
 const Record = require('../models/record.model');
 const Sensor = require('../models/sensor.model');
+const SensorType = require('../models/sensorType.model');
 const TelemetryEntity = require('../models/telemetryEntity.model');
 
 exports.getAllTelemetry = (req, res) => {
@@ -159,21 +160,43 @@ exports.getSensorsBycomputerId = async (req, res) => {
 
 exports.getRecordsBycomputerId = async (req, res) => {
     try {
-        console.log("telemetryEntity in getRecordsBycomputerId: " + req.params.telemetryEntityId);
-        const records = await Record.find({ telemetryEntityId: req.params.telemetryEntityId })
-        .populate({
-            path: 'sensorId',
-            select: 'sensorTypeId',
-            populate: {
-            path: 'sensorTypeId',
-            model: 'SensorType',
-            },
-        })
+        // Gather CPU Sensor records
+        const cpuSensorTypeId = await SensorType.findOne({ name: 'Cpu Sensor' }).select('_id').exec();
+        const cpuSensors = await Sensor.find({ sensorTypeId: cpuSensorTypeId }).exec();
+        const cpuSensorIds = cpuSensors.map(sensor => sensor._id);
+        const cpuSensorRecords = await Record.find({ sensorId: { $in: cpuSensorIds }, telemetryEntityId: req.params.telemetryEntityId })
         .limit(100)
         .sort([['date', -1]])
         .exec();
-        console.log("records: ", records);
-        res.status(200).json(records);
+
+        console.log('CPU Sensor Records:', cpuSensorRecords);
+
+        // Gather Disk Sensor records
+        const diskSensorTypeId = await SensorType.findOne({ name: 'Disk Sensor' }).select('_id').exec();
+        const diskSensors = await Sensor.find({ sensorTypeId: diskSensorTypeId }).exec();
+        const diskSensorIds = diskSensors.map(sensor => sensor._id);
+        const diskSensorRecords = await Record.find({ sensorId: { $in: diskSensorIds }, telemetryEntityId: req.params.telemetryEntityId })
+        .limit(100)
+        .sort([['date', -1]])
+        .exec();
+
+        console.log('Disk Sensor Records:', diskSensorRecords);
+
+        // Gather Memory Sensor records
+        const memorySensorTypeId = await SensorType.findOne({ name: 'Ram Sensor' }).select('_id').exec();
+        const memorySensors = await Sensor.find({ sensorTypeId: memorySensorTypeId }).exec();
+        const memorySensorIds = memorySensors.map(sensor => sensor._id);
+        const memorySensorRecords = await Record.find({ sensorId: { $in: memorySensorIds }, telemetryEntityId: req.params.telemetryEntityId })
+        .limit(100)
+        .sort([['date', -1]])
+        .exec();
+
+        console.log('Memory Sensor Records:', memorySensorRecords);
+
+        const result = {"cpu": cpuSensorRecords, "disk": diskSensorRecords, "memory": memorySensorRecords};
+
+        res.status(200).json(result);
+
     } catch (error) {
         console.log(error);
     }

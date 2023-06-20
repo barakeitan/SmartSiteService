@@ -45,6 +45,7 @@ exports.isAuthenticate = (req, res) => {
     // Verify access token
     jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
       if (err) {
+        console.log('Unauthorized: Invalid token');
         return res.status(401).json({ message: 'Unauthorized: Invalid token' });
       }
         if (decoded.exp && (Math.floor(Date.now() / 1000) - decoded.exp) > process.env.ACCESS_TOKEN_EXPIRED_IN) {
@@ -58,41 +59,7 @@ exports.isAuthenticate = (req, res) => {
   }
 }
 
-exports.GenerateNewAccessToken = (req, res) => {
-  const refreshToken = req.body.refreshToken;
-  // const username = req.body.username;
-  const email = req.body.email;
-
-  User.findOne({ email: email }, (err, user) => {
-    if (!refreshToken) {
-      return res.status(401).send('Refresh token not provided');
-    }
-  
-    // Check if refresh token is valid
-    const validRefreshToken = checkRefreshToken(refreshToken);
-  
-    if (!validRefreshToken) {
-      return res.status(403).send('Invalid refresh token');
-    }
-  
-    const { _id, name, email, role } = user;
-    // Generate new access token
-    const accessToken = jwt.sign(
-      { 
-        user: { _id, email, name, role }, 
-        // expiration: Number(new Date() + parseInt(process.env.TOKEN_EXPIRED_IN))
-      },
-      process.env.ACCESS_TOKEN_SECRET,
-      {
-        expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRED_IN)
-      }
-    );
-      // Send new access token in response
-      res.json({ accessToken });
-  });
-}
-
-exports.checkRefreshToken = (refreshToken, email, callback) => {
+const checkRefreshToken = (refreshToken, email, callback) => {
   // Find the refresh token document for the given email
   User.findOne({ email: email }, (err, user) => {
     if (err) {
@@ -119,6 +86,44 @@ exports.checkRefreshToken = (refreshToken, email, callback) => {
     }
   });
 }
+
+const refreshTokenCallBack = (isValid) => {
+  //do nothing
+}
+exports.GenerateNewAccessToken = (req, res) => {
+  const refreshToken = req.body.refreshToken;
+  // const username = req.body.username;
+  const email = req.body.email;
+
+  User.findOne({ email: email }, (err, user) => {
+    if (!refreshToken) {
+      return res.status(401).send('Refresh token not provided');
+    }
+  
+    // Check if refresh token is valid
+    const validRefreshToken = checkRefreshToken(refreshToken, "email@gmail.com", refreshTokenCallBack);
+  
+    if (!validRefreshToken) {
+      return res.status(403).send('Invalid refresh token');
+    }
+  
+    const { _id, name, email, role } = user;
+    // Generate new access token
+    const accessToken = jwt.sign(
+      { 
+        user: { _id, email, name, role }, 
+        // expiration: Number(new Date() + parseInt(process.env.TOKEN_EXPIRED_IN))
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRED_IN)
+      }
+    );
+      // Send new access token in response
+      res.json({ accessToken });
+  });
+}
+
 
 
 exports.signin = (req, res) => {

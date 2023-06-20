@@ -11,10 +11,12 @@ require('dotenv').config();
 // import routes
 const authRoutes = require('./src/routes/auth.routes');
 const userRoutes = require('./src/routes/user.routes');
-const telemetryReoutes = require("./src/routes/telemetry");
+const telemetryReoutes = require("./src/routes/telemetry.routes");
 const routes = require('./src/routes');
 const {sensorTypeSeeders,sensorsSeeders} = require("./src/seeders");
 const { broadcast } = require("./wsServer");
+const {start_intervals} = require('./src/services/sensorAnalytics')
+const { generateRecordsDataByFilter } = require('./src/seeders/generateRecords');
 
 // app
 const app = express();
@@ -34,6 +36,13 @@ const connectDB = async () => {
     console.log('MongoDB Connected');
     // await sensorTypeSeeders()
     // await sensorsSeeders();
+
+    // for temerature sensor with 24 hours filter - i already run this
+    // await generateRecordsDataByFilter(23, 30, "Today", "64847ead6e64fa517740604c", "647b44a207ab16da82a6a0ca");
+
+    // for sound sensor with 24 hours filter
+    // await generateRecordsDataByFilter(300, 800, "Today", "64848bb433ec04336cfdf7a8", "647b44a207ab16da82a6a0ca");
+    
   } catch (err) {
     console.error(err.message);
     // exit process with failure
@@ -85,8 +94,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-
-// sampleTelemetryInfo();
+start_intervals();
 
 const PORT = process.env.PORT || 3002;
 

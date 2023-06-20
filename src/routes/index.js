@@ -5,12 +5,14 @@ const SiteRouter = require('./site.routes');
 const sensorRouter = require('./sensor.routes');
 const malfunctionRouter = require('./malfunction.routes');
 const recordRouter = require('./record.routes');
+const telemetryRouter = require('./telemetry.routes');
 
 router.use('/room',RoomRouter);
 router.use('/site',SiteRouter);
 router.use('/sensor',sensorRouter);
 router.use('/malfunction',malfunctionRouter);
 router.use('/record',recordRouter);
+router.use('/telemetry',telemetryRouter);
 
 
 module.exports = router;

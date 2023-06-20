@@ -2,7 +2,18 @@ const Malfunction = require('../models/malfunction.model');
 
 exports.getMalfunctionsByRoomId = async (req, res) => {
     try {
-        const malfunctions = await Malfunction.find({ roomId: req.params.roomId }).populate("sensorId", "malfunctionTypeId").exec();
+        const malfunctions = await Malfunction.find({ roomId: req.params.roomId })
+        .populate({
+            path: 'sensorId',
+            select: 'sensorTypeId',
+            populate: {
+            path: 'sensorTypeId',
+            model: 'SensorType',
+            },
+        })
+        .limit(100)
+        .sort([['date', -1]])
+        .exec();
         res.status(200).json(malfunctions);
     } catch (error) {
         console.log(error);
@@ -11,7 +22,7 @@ exports.getMalfunctionsByRoomId = async (req, res) => {
 
 exports.createMalfunction = async (req, res) => {
     try {
-        const malfunction = await Malfunction.create({ ...req.body }).exec();
+        const malfunction = await new Malfunction({ ...req.body }).save();
         res.status(200).json(malfunction);
     } catch (error) {
         console.log(error);

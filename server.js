@@ -60,29 +60,45 @@ app.use(cors());
 
 // routes middleware
 
+if (process.env.NODE_ENV == "development") {
+  const swaggerUI = require("swagger-ui-express")
+  const swaggerJsDoc = require("swagger-jsdoc")
+  const options = {
+  definition: {
+  openapi: "3.0.0",
+  info: {
+  title: "Library API",
+  version: "1.0.0",
+  description: "A simple Express Library API",
+  },
+  servers: [{url: `http://localhost:${process.env.PORT}`}],
+  },
+  apis: ["./src/routes/*.js"],
+  };
+  const specs = swaggerJsDoc(options);
+ 
+  app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
+}
+
+/**
+* @swagger
+* tags:
+* name: auth
+* description: The authentication API
+*/
 app.use('/api', authRoutes);
+/**
+* @swagger
+* tags:
+* name: user
+* description: The user API
+*/
 app.use('/api', userRoutes);
+
 app.use('/api',telemetryReoutes);
 app.use('/api',routes);
 
-if (process.env.NODE_ENV == "development") {
-    const swaggerUI = require("swagger-ui-express")
-    const swaggerJsDoc = require("swagger-jsdoc")
-    const options = {
-    definition: {
-    openapi: "3.0.0",
-    info: {
-    title: "Library API",
-    version: "1.0.0",
-    description: "A simple Express Library API",
-    },
-    servers: [{url: `http://localhost:${process.env.PORT}`,},],
-    },
-    apis: ["./routes/*.js"],
-    };
-    const specs = swaggerJsDoc(options);
-    app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
- }
+
 
 // Server static assets if in production
 if (process.env.NODE_ENV === 'production') {

@@ -3,6 +3,26 @@ const crypto = require('crypto');
 const { v1: uuidv1 } = require('uuid');
 const bcrypt = require('bcrypt');
 
+/**
+* @swagger
+* components:
+  * schemas:
+    * User:
+      * type: object
+      * required:
+        * - email
+        * - password
+* properties:
+* email:
+* type: string
+* description: The user email
+* password:
+* type: string
+* description: The user password
+* example:
+* email: 'bob@gmail.com'
+* password: '123456'
+*/
 const userSchema = new mongoose.Schema(
   {
     name: {

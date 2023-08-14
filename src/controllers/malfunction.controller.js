@@ -1,4 +1,6 @@
 const Malfunction = require('../models/malfunction.model');
+const Sensor = require('../models/sensor.model');
+const {sendMessage} = require("../helpers/messages/telegram");
 
 exports.getMalfunctionsByRoomId = async (req, res) => {
     try {
@@ -24,7 +26,10 @@ exports.getMalfunctionsByRoomId = async (req, res) => {
 
 exports.createMalfunction = async (req, res) => {
     try {
-        const malfunction = await new Malfunction({ ...req.body }).save();
+        const WARNING_SEVERITY = "WARNING";
+        const malfunction = await new Malfunction({ recent_data:"None",severity:WARNING_SEVERITY,...req.body }).save();
+        const sensor = await Sensor.findOne({ _id: req.body?.sensorId }).exec();
+        await sendMessage(req.body.roomId,sensor,req.body.malfunctionTypeId,WARNING_SEVERITY);
         res.status(200).json(malfunction);
     } catch (error) {
         console.log(error);

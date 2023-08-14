@@ -246,7 +246,7 @@ async function check_if_exists_last_hour(room, sensor, malfunctionTypeId, severi
         //if there is no malfunction within the last hour in sensor and
         //his mal_type then insert a new one
         await insertMalfunction(room, sensor, malfunctionTypeId, message, severity);
-        // await sendMessage(room, sensor, malfunctionTypeId);
+        await sendMessage(room, sensor, malfunctionTypeId,severity);
         // analyticsCallback();
     }
     //console.log(malfunctions)
@@ -297,16 +297,16 @@ async function insertMalfunction(room, sensor, malfunctionTypeId, message, sever
  */
 const updateStatusInGeneral = async () => {
     try {
+        // console.log("in update status in general");
+        
       const sites = await Site.find({}).exec();
-
       for (const site of sites) {
-        let site_maxStatus = "0";
+        let rooms_maxStatus = "0";
         const rooms = await Room.find({ siteId: site._id }).exec();
 
         for (const room of rooms) {
           const sensors = await Sensor.find({ roomId: room._id }).exec();
           let sensors_maxStatus = "0";
-
           for (const sensor of sensors) {
             if (sensor.status > sensors_maxStatus) {
               sensors_maxStatus = sensor.status;
@@ -315,17 +315,18 @@ const updateStatusInGeneral = async () => {
 
           if (sensors_maxStatus !== "0") {
             room.status = sensors_maxStatus;
-            if (room.status > site_maxStatus) {
-              site_maxStatus = room.status;
+            if(room.status>rooms_maxStatus){
+                rooms_maxStatus=room.status;
             }
             await room.save();
           }
         }
-
-        if (site_maxStatus !== "0") {
-          site.status = site_maxStatus;
+        if (rooms_maxStatus !== "0") {
+          site.status = rooms_maxStatus;
           await site.save();
         }
+        rooms_maxStatus = "0";
+        
       }
     } catch (error) {
       console.error(error);
@@ -478,7 +479,7 @@ function check_ram_danger(sensor){
 }
 
 function check_disk_warning(sensor){
-    console.log("WARNING : DISK");
+    // console.log("WARNING : DISK");
 }
 
 function check_disk_danger(sensor){
